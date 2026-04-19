@@ -21,7 +21,7 @@
       overflow: hidden; background: #fff;
     }
     .code-panel.open { display: block; }
-    .code-panel-tabs { display: flex; background: #f3f2fd; border-bottom: 1px solid #d4d0f5; }
+    .code-panel-tabs { display: flex; background: #f3f2fd; border-bottom: 1px solid #d4d0f5; flex-wrap: wrap; }
     .cp-tab {
       padding: 9px 18px; border: none; background: transparent;
       font-size: 0.82rem; font-weight: 500; cursor: pointer;
@@ -42,7 +42,7 @@
       margin: 0; padding: 12px 14px;
       background: #1e1e2e; color: #cdd6f4;
       font-family: 'Fira Code', Consolas, 'Courier New', monospace;
-      font-size: 0.78rem; line-height: 1.8;
+      font-size: 0.78rem; line-height: 1.85;
       border-radius: 6px; overflow-x: auto; white-space: pre;
     }
     .cp-warn {
@@ -69,7 +69,7 @@
       line-height: 1.9; white-space: pre-wrap; margin-bottom: 8px; color: #222;
     }
     .cq-inp {
-      display: inline-block; min-width: 110px;
+      display: inline-block; min-width: 120px;
       border: none; border-bottom: 2px solid #534AB7;
       background: transparent;
       font-family: 'Fira Code', Consolas, monospace; font-size: 0.78rem;
@@ -158,33 +158,40 @@ a = np.array([1,2,3])          # 1D array
 b = np.array([[1,2],[3,4]])    # 2D array (행렬)
 print(b.shape)   # (2,2)
 print(b.T)       # 전치행렬
-print(b @ b)     # 행렬 곱
-print(b * b)     # 성분별 곱
+print(b @ b)     # 행렬 곱  → [[7,10],[15,22]]
+print(b * b)     # 성분별 곱 → [[1,4],[9,16]]
 
-np.zeros((3,3))  # 0으로 채운 3x3
-np.ones((2,4))   # 1로 채운 2x4
-np.eye(3)        # 3x3 단위행렬
-np.arange(1,10,2) # [1,3,5,7,9]</div>
+np.zeros((3,3))       # 0으로 채운 3x3
+np.ones((2,4))        # 1로 채운 2x4
+np.eye(3)             # 3x3 단위행렬
+np.arange(1, 10, 2)   # [1,3,5,7,9]</div>
         <div class="important">⚠️ 행렬 곱(@)과 성분별 곱(*)을 구분하자!</div>
       </div>
     </div>
     <div class="card">
-      <div class="card-title">📸 OpenCV 기본 함수</div>
+      <div class="card-title">📸 OpenCV 기본 함수 — PDF 예제 코드</div>
       <div class="card-body">
         <div class="code-block">import cv2
 
-img = cv2.imread('image.jpg')           # 컬러 읽기
-img_gray = cv2.imread('image.jpg',
-             cv2.IMREAD_GRAYSCALE)      # 흑백 읽기
-print(img.shape)       # (H, W, 3) → BGR 3채널
-print(img_gray.shape)  # (H, W) → 1채널
+# 이미지 읽기 (BGR 형태로 저장됨)
+input = cv2.imread('week2_img.jpg')
+print(input.shape)   # (427, 640, 3)
 
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # 변환
-cv2.imshow('window', img)  # 화면 출력
-cv2.waitKey(0)             # 키 입력 대기
-cv2.destroyAllWindows()    # 창 닫기
-cv2.imwrite('out.jpg', img) # 저장</div>
-        <div class="important">⚠️ OpenCV는 BGR 순서! (RGB가 아님). Matplotlib으로 출력 시 RGB로 변환 필요</div>
+# 흑백으로 읽기
+input = cv2.imread('week2_img.jpg', cv2.IMREAD_GRAYSCALE)
+print(input.shape)   # (427, 640)
+
+# 컬러 → 흑백 변환
+gray_input = cv2.cvtColor(input, cv2.COLOR_BGR2GRAY)
+
+# 화면 출력
+cv2.imshow('window1', input)
+cv2.waitKey(0)           # 키 입력 대기 (창이 바로 닫히지 않도록)
+cv2.destroyAllWindows()  # 모든 창 종료
+
+# 이미지 저장
+cv2.imwrite('output.jpg', input)</div>
+        <div class="important">⚠️ OpenCV는 BGR 순서! Matplotlib 출력 시 cv2.COLOR_BGR2RGB 변환 필요</div>
       </div>
     </div>
     <button class="btn-ask" onclick="window.open('week2_python_easy_explainer.html','_blank')">더 자세히 보기 ↗</button>
@@ -198,30 +205,69 @@ cv2.imwrite('out.jpg', img) # 저장</div>
       <div class="card-body">이미지 해상도 줄이기(서브샘플링)와 색 단계 줄이기(양자화)를 다룹니다.</div>
     </div>
     <div class="card">
-      <div class="card-title">📷 서브샘플링 (Subsampling)</div>
+      <div class="card-title">📷 서브샘플링 — PDF 실습 코드</div>
       <div class="card-body">
-        <div class="important">📷 사진을 1/2, 1/4로 작게 만드는 것. cv2.resize() 사용!</div>
-        <div class="code-block">img = cv2.imread('dogs.jpg')
-h, w = img.shape[:2]
+        <div class="important">BGR로 읽은 뒤 RGB로 변환해서 resize → 저장 시 다시 BGR로 변환!</div>
+        <div class="code-block">import cv2
+import matplotlib.pyplot as plt
 
-half    = cv2.resize(img, (w//2, h//2))
-quarter = cv2.resize(img, (w//4, h//4))
+# BGR로 읽기 → RGB로 변환 (matplotlib 시각화 용)
+img_bgr = cv2.imread('plane.jpg', cv2.IMREAD_COLOR)
+img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+h, w, c = img_rgb.shape
 
-cv2.imwrite('half.jpg', half)</div>
-        <div class="card-body" style="margin-top:8px">과제: dogs.jpg를 2, 4, 8배로 서브샘플링 → 파이썬 1개 + 이미지 3개 제출</div>
+# 1/2로 서브샘플링
+img_subsampled2 = cv2.resize(img_rgb, (w // 2, h // 2))
+
+# matplotlib으로 비교 출력
+fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+axes[0].imshow(img_rgb)
+axes[0].set_title(f'Original ({w}x{h})')
+axes[0].axis('on')
+axes[1].imshow(img_subsampled2)
+axes[1].set_title(f'Subsampled ({w//2}x{h//2})')
+axes[1].axis('on')
+plt.show()
+
+# 저장 시 RGB → BGR 재변환 필요
+img_save_bgr = cv2.cvtColor(img_subsampled2, cv2.COLOR_RGB2BGR)
+cv2.imwrite('subsampled_2.jpg', img_save_bgr)</div>
       </div>
     </div>
     <div class="card">
-      <div class="card-title">🎨 양자화 (Quantization)</div>
+      <div class="card-title">🎨 양자화 — PDF 실습 코드</div>
       <div class="card-body">
-        <div class="important">🎨 256색(0~255)을 4색, 8색처럼 줄이는 것. 계단 현상 발생!</div>
-        <div class="code-block">img = cv2.imread('xray.jpg', cv2.IMREAD_GRAYSCALE)
-levels = 4
+        <div class="code-block">import cv2
+import numpy as np
+import matplotlib.pyplot as plt
 
-group_size = 256 // levels          # = 64
-quantized  = (img // group_size) * (255 // (levels-1))
-quantized  = quantized.astype(np.uint8)</div>
-        <div class="card-body" style="margin-top:8px">과제: xray.jpg를 32, 8, 4, 2단계로 양자화 → 이미지 4개 제출</div>
+# 흑백으로 읽기
+img = cv2.imread('chest.jpg', cv2.IMREAD_GRAYSCALE)
+
+quant_factor = 4   # 4단계로 양자화
+
+# Step 1: 그룹 크기 계산
+factor = 256 // quant_factor
+# Step 2: 그룹화 + 0~255 범위로 스케일링
+img_quantized = (img // factor) * (255 // (quant_factor - 1))
+# Step 3: uint8 변환
+img_quantized = img_quantized.astype(np.uint8)
+
+# 비교 출력
+fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+axes[0].imshow(img,           cmap='gray')
+axes[0].set_title(f'Original')
+axes[0].axis('on')
+axes[1].imshow(img_quantized, cmap='gray')
+axes[1].set_title(f'Quantized ({quant_factor} Levels)')
+axes[1].axis('on')
+plt.show()
+
+cv2.imwrite('img_quantized.jpg', img_quantized)</div>
+        <div class="card-body" style="margin-top:8px">
+          과제 1: dogs.jpg를 2, 4, 8배로 서브샘플링 → 파이썬 1개 + 이미지 3개<br>
+          과제 2: xray.jpg를 32, 8, 4, 2단계로 양자화 → 파이썬 1개 + 이미지 4개
+        </div>
       </div>
     </div>
     <button class="btn-ask" onclick="window.open('quantization_easy_explainer.html','_blank')">개념 더 쉽게 보기 ↗</button>
@@ -237,34 +283,32 @@ quantized  = quantized.astype(np.uint8)</div>
     <div class="card">
       <div class="card-title">🌊 저주파 vs 고주파</div>
       <div class="card-body">
-        <div class="important">🌊 저주파 = 천천히 변하는 부분 (배경, 하늘) / 고주파 = 빠르게 변하는 부분 (엣지, 경계선)</div>
+        <div class="important">저주파 = 천천히 변하는 부분 (배경) / 고주파 = 빠르게 변하는 부분 (엣지, 경계선)</div>
       </div>
     </div>
     <div class="card">
       <div class="card-title">⭐ Nyquist 정리</div>
       <div class="card-body">
         <div class="important">Stride(간격)가 Nyquist frequency보다 크면 → 앨리어싱(aliasing) 발생! 정보 왜곡!</div>
-        <div class="card-body" style="margin-top:8px">Zone Plate 이미지로 확인: stride를 크게 하면 바깥쪽(고주파) 영역이 뭉개짐</div>
       </div>
     </div>
     <div class="card">
       <div class="card-title">⭐ 보간법 (Interpolation) 핵심</div>
       <div class="card-body">
-        <div class="important">📸 작은 이미지를 크게 키울 때 없는 픽셀을 채우는 방법!</div>
         <div class="two-col">
           <div class="two-col-item"><div class="col-title">Nearest Neighbor</div><div class="col-desc">가장 가까운 픽셀 값 그대로 복사. 빠르지만 계단 현상</div></div>
-          <div class="two-col-item"><div class="col-title">Bilinear</div><div class="col-desc">주변 4개 점을 선형 보간. 더 부드러운 결과</div></div>
+          <div class="two-col-item"><div class="col-title">Bilinear</div><div class="col-desc">주변 4개 점 선형 보간. 더 부드러운 결과</div></div>
           <div class="two-col-item"><div class="col-title">Bicubic</div><div class="col-desc">주변 16개 점으로 3차 함수 보간. 가장 부드러움</div></div>
-          <div class="two-col-item"><div class="col-title">OpenCV 코드</div><div class="col-mono">cv2.resize(img, (w,h),<br>interpolation=cv2.INTER_LINEAR)</div></div>
+          <div class="two-col-item"><div class="col-title">OpenCV 상수</div><div class="col-mono">INTER_NEAREST<br>INTER_LINEAR<br>INTER_CUBIC</div></div>
         </div>
       </div>
     </div>
     <div class="card">
       <div class="card-title">📋 Week 4 과제 요약</div>
       <div class="card-body">
-        <div class="step"><div class="step-num">1</div><div class="step-text">Zone Plate 이미지를 stride 2, 4, 8로 서브샘플링 후 복원 → 이미지 3개</div></div>
-        <div class="step"><div class="step-num">2</div><div class="step-text">stride=4 고정, GaussianBlur 적용 후 서브샘플링. 커널/sigma 조절해 최적값 찾기 + 트레이드오프 분석 주석 작성</div></div>
-        <div class="step"><div class="step-num">3</div><div class="step-text">pandas.jpg에 수동 Bilinear 보간 vs cv2.resize(INTER_LINEAR) 비교 + 차이 이미지 저장</div></div>
+        <div class="step"><div class="step-num">1</div><div class="step-text">Zone Plate 이미지를 stride 2, 4, 8로 서브샘플링 후 복원 → 이미지 3개만 제출</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">stride=4 고정, GaussianBlur 적용 후 서브샘플링. 트레이드오프 분석 주석 포함 → 파이썬 1개 + 이미지 1개</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text">pandas.jpg에 수동 Bilinear vs cv2.INTER_LINEAR 비교 + 차이 이미지 → 파이썬 1개 + 이미지 3개</div></div>
       </div>
     </div>
 
@@ -275,93 +319,219 @@ quantized  = quantized.astype(np.uint8)</div>
         <button class="cp-tab" onclick="switchCodeTab('w4','hw',this)">과제 코드</button>
         <button class="cp-tab" onclick="switchCodeTab('w4','quiz',this)">빈칸 퀴즈</button>
       </div>
+
       <div class="cp-sec active" id="w4-lab">
+
         <div class="cp-card">
-          <div class="cp-card-title">실습 1 · Zone Plate 생성</div>
-          <div class="cp-desc">중심에서 멀수록 주파수가 높아지는 테스트 이미지.</div>
+          <div class="cp-card-title">실습 0 · 저주파/고주파 영역 시각화 — 스크린샷 코드</div>
+          <div class="cp-desc">birds.png 이미지에서 고주파/저주파 영역을 추출해 3D surface plot으로 비교.</div>
+          <pre class="cp-code">import matplotlib.pyplot as plt
+from matplotlib import cm
+import numpy as np
+import cv2
+
+img = cv2.imread('birds.png', cv2.IMREAD_GRAYSCALE)
+
+h, w   = img.shape
+size   = 100
+
+high_freq_region = img[h//2-size//2:h//2+size//2, w//2-size//2:w//2+size//2]  # Center slightly below
+low_freq_region  = img[0:size, w-size:w]  # Top right
+
+x = np.arange(size)
+y = np.arange(size)
+x, y = np.meshgrid(x, y)
+
+fig = plt.figure()
+ax0 = fig.add_subplot(121, projection='3d')
+ax1 = fig.add_subplot(122, projection='3d')
+ax0.plot_surface(x, y, high_freq_region.astype(float), cmap=cm.viridis)
+ax1.plot_surface(x, y, low_freq_region.astype(float),  cmap=cm.viridis)
+plt.show()</pre>
+        </div>
+
+        <div class="cp-card">
+          <div class="cp-card-title">실습 1 · Zone Plate 생성 + Sampling — 스크린샷 코드</div>
+          <div class="cp-desc">np.linspace + np.sin 방식. Experiment A(aliasing) / B(anti-aliasing) 비교.</div>
           <pre class="cp-code">import numpy as np
 import cv2
 
-H, W = 512, 512
-y, x = np.indices((H, W))
-r2 = (x - W//2)**2 + (y - H//2)**2
+# 1. Zone Plate image generation function
+def generate_zone_plate(size=512):
+    x = np.linspace(-1, 1, size)
+    y = np.linspace(-1, 1, size)
+    X, Y = np.meshgrid(x, y)
+    R = np.sqrt(X**2 + Y**2)
+    # Design frequency increases with distance from center
+    zone_plate = np.sin(100 * np.pi * R**2)
+    # Convert to uint8 scale 0~255 (for OpenCV processing)
+    zone_plate = ((zone_plate + 1) / 2 * 255).astype(np.uint8)
+    return zone_plate
 
-zone = np.cos(r2 / 500.0)
-zone = ((zone + 1) / 2 * 255).astype(np.uint8)
-cv2.imwrite('zone_plate.jpg', zone)</pre>
+# Generate original Zone Plate
+img    = generate_zone_plate(512)
+h, w   = img.shape
+
+# 2. 4x Down-sampling setting (induce Nyquist condition violation)
+stride = 4
+
+# [Experiment A] Sampling without filtering (Aliasing occurs)
+aliased_sub      = img[::stride, ::stride]
+# Restore to original size with Nearest Neighbor (shows pixel distortion as is)
+aliased_restored = cv2.resize(aliased_sub, (w, h),
+                              interpolation=cv2.INTER_NEAREST)
+
+# [Experiment B] Anti-aliasing (Sampling after applying Lowpass Filter)
+# Remove high-frequency components from the periphery in advance
+blurred_img           = cv2.GaussianBlur(img, (15, 15), 5)
+anti_aliased_sub      = blurred_img[::stride, ::stride]
+anti_aliased_restored = cv2.resize(anti_aliased_sub, (w, h),
+                                   interpolation=cv2.INTER_NEAREST)</pre>
+          <div class="cp-warn">Stride가 Nyquist frequency보다 크면 정보 왜곡이 생긴다!</div>
         </div>
+
         <div class="cp-card">
-          <div class="cp-card-title">실습 2 · stride 서브샘플링 + 복원</div>
-          <div class="cp-desc">stride 간격으로 픽셀을 건너뛰어 샘플링. stride가 크면 앨리어싱 발생.</div>
-          <pre class="cp-code">import numpy as np
-import cv2
+          <div class="cp-card-title">실습 2 · Nearest Neighbor 보간 — 스크린샷 코드 (8/10)</div>
+          <div class="cp-desc">UPSAM_BEFORE(간격만 배치) / UPSAM_AFTER(블록 채우기) 비교. cat.jpg 사용.</div>
+          <pre class="cp-code">import cv2
+import numpy as np
+import matplotlib.pyplot as plt
 
-zone = cv2.imread('zone_plate.jpg', cv2.IMREAD_GRAYSCALE)
+img     = cv2.imread('cat.jpg')
+# OpenCV(BGR) → Matplotlib(RGB) 채널 변환
+img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-for stride in [2, 4, 8]:
-    sampled  = zone[::stride, ::stride]
-    restored = cv2.resize(
-        sampled,
-        (zone.shape[1], zone.shape[0]),
-        interpolation=cv2.INTER_NEAREST
-    )
-    cv2.imwrite(f'zone_stride{stride}.jpg', restored)</pre>
-          <div class="cp-warn">Stride &gt; Nyquist frequency → 앨리어싱 발생! 바깥쪽 고주파 영역이 뭉개짐.</div>
+H, W, C = img_rgb.shape
+UP = 2
+
+# 1. Before interpolation
+UPSAM_BEFORE = np.zeros((H*UP, W*UP, C), dtype=np.uint8)
+for i in range(H):
+    for j in range(W):
+        UPSAM_BEFORE[i*UP, j*UP, :] = img_rgb[i, j, :]
+
+# 2. After interpolation (Nearest Neighbor)
+UPSAM_AFTER = np.zeros((H*UP, W*UP, C), dtype=np.uint8)
+for i in range(H):
+    for j in range(W):
+        UPSAM_AFTER[i*UP:(i+1)*UP, j*UP:(j+1)*UP, :] = img_rgb[i, j, :]
+
+# Matplotlib을 이용한 결과 출력
+plt.figure(figsize=(12, 6))
+
+plt.subplot(1, 2, 1)
+plt.title('Before interpolation')
+plt.imshow(UPSAM_BEFORE)
+plt.axis('off')  # 축 눈금 숨김
+
+plt.subplot(1, 2, 2)
+plt.title('After interpolation')
+plt.imshow(UPSAM_AFTER)
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()</pre>
         </div>
+
         <div class="cp-card">
-          <div class="cp-card-title">실습 3 · Gaussian Blur → 서브샘플링 (Anti-aliasing)</div>
-          <div class="cp-desc">샘플링 전 GaussianBlur로 고주파 제거 → 앨리어싱 감소.</div>
-          <pre class="cp-code">import numpy as np
-import cv2
+          <div class="cp-card-title">실습 3 · Bilinear 보간 — 스크린샷 코드 (9/10)</div>
+          <div class="cp-desc">image_lerp1 배열로 가로→세로 2단계 선형 보간. cat.jpg, BGR→RGB 변환 포함.</div>
+          <pre class="cp-code">import cv2
+import numpy as np
+import matplotlib.pyplot as plt
 
-zone    = cv2.imread('zone_plate.jpg', cv2.IMREAD_GRAYSCALE)
-stride  = 4
+plt.figure(figsize=(16, 12))
 
-blurred  = cv2.GaussianBlur(zone, (9, 9), sigmaX=3)
-sampled  = blurred[::stride, ::stride]
-restored = cv2.resize(
-    sampled,
-    (zone.shape[1], zone.shape[0]),
-    interpolation=cv2.INTER_NEAREST
-)
-cv2.imwrite('zone_blur_stride4.jpg', restored)</pre>
+# 1. Load image and convert BGR to RGB for Matplotlib
+image_bgr = cv2.imread('cat.jpg')
+image     = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
+h, w, c   = image.shape
+scaling   = 2
+
+# ==================== Step 1-1: Horizontal Spacing ====================
+image_lerp1 = np.zeros((h, w*scaling, c), dtype=np.uint8)
+
+# Modify j range to w (Prevent IndexError)
+for i in range(h):
+    for j in range(w):
+        image_lerp1[i, 2*j, :] = image[i, j, :]
+
+# Output Step 1-1
+plt.subplot(2, 2, 1)
+plt.title('Step 1-1: Horizontal Spacing')
+plt.imshow(image_lerp1)
+plt.axis('off')
+
+# ==================== Step 1-2: Horizontal Interpolation ====================
+for i in range(h):
+    for j in range(w-1):
+        # Calculate as int to prevent overflow, then restore to uint8
+        val1 = image_lerp1[i, 2*j,   :].astype(int)
+        val2 = image_lerp1[i, 2*j+2, :].astype(int)
+        image_lerp1[i, 2*j+1, :] = ((val1 + val2) / 2).astype(np.uint8)
+
+# Output Step 1-2
+plt.subplot(2, 2, 2)
+plt.title('Step 1-2: Horizontal Interpolation')
+plt.imshow(image_lerp1)
+plt.axis('off')
+
+# ==================== Step 2-1: Vertical Spacing ====================
+interpolated_image = np.zeros((h*scaling, w*scaling, c), dtype=np.uint8)
+
+for i in range(h):
+    for j in range(w*scaling):
+        interpolated_image[2*i, j, :] = image_lerp1[i, j, :]
+
+# Output Step 2-1
+plt.subplot(2, 2, 3)
+plt.title('Step 2-1: Vertical Spacing')
+plt.imshow(interpolated_image)
+plt.axis('off')
+
+# ==================== Step 2-2: Vertical Interpolation ====================
+for i in range(h-1):
+    for j in range(w*scaling):
+        # Calculate as int to prevent overflow, then restore to uint8
+        val1 = interpolated_image[2*i,   j, :].astype(int)
+        val2 = interpolated_image[2*i+2, j, :].astype(int)
+        interpolated_image[2*i+1, j, :] = ((val1 + val2) / 2).astype(np.uint8)
+
+# Output Step 2-2
+plt.subplot(2, 2, 4)
+plt.title('Step 2-2: Vertical Interpolation')
+plt.imshow(interpolated_image)
+plt.axis('off')
+
+# Add main title for the entire figure
+plt.suptitle('Bilinear Interpolation Process', fontsize=16)
+plt.tight_layout()
+plt.show()</pre>
         </div>
+
         <div class="cp-card">
-          <div class="cp-card-title">실습 4 · 수동 Bilinear 보간 vs cv2.resize</div>
-          <pre class="cp-code">import numpy as np
-import cv2
+          <div class="cp-card-title">실습 4 · Bilinear — cv2.resize 버전 (10/10)</div>
+          <div class="cp-desc">cv2.INTER_LINEAR로 간단하게 2배 확대. cv2.imshow 사용.</div>
+          <pre class="cp-code">import cv2
+import numpy as np
 
-img = cv2.imread('pandas.jpg', cv2.IMREAD_GRAYSCALE).astype(float)
-H, W   = img.shape
-newH, newW = H * 2, W * 2
+image = cv2.imread('cat.jpg')
 
-# ── 수동 Bilinear ──────────────────────────────────
-result_manual = np.zeros((newH, newW))
-for ny in range(newH):
-    for nx in range(newW):
-        ox = nx * (W - 1) / (newW - 1)
-        oy = ny * (H - 1) / (newH - 1)
-        x0, y0 = int(ox), int(oy)
-        x1 = min(x0 + 1, W - 1)
-        y1 = min(y0 + 1, H - 1)
-        tx, ty = ox - x0, oy - y0
-        r1 = img[y0, x0] * (1 - tx) + img[y0, x1] * tx
-        r2 = img[y1, x0] * (1 - tx) + img[y1, x1] * tx
-        result_manual[ny, nx] = r1 * (1 - ty) + r2 * ty
-result_manual = result_manual.astype(np.uint8)
+h, w, c   = image.shape
+scaling   = 2
+img_size  = (w*scaling, h*scaling)
 
-# ── OpenCV Bilinear ────────────────────────────────
-result_cv2 = cv2.resize(
-    img.astype(np.uint8), (newW, newH),
-    interpolation=cv2.INTER_LINEAR
-)
+resized_image = cv2.resize(image, img_size,
+                           interpolation=cv2.INTER_LINEAR)
 
-diff = cv2.absdiff(result_manual, result_cv2)
-cv2.imwrite('bilinear_manual.jpg', result_manual)
-cv2.imwrite('bilinear_cv2.jpg',    result_cv2)
-cv2.imwrite('bilinear_diff.jpg',   diff)</pre>
+cv2.imshow('Original Image',         image)
+cv2.imshow('Bilinear Interpolation', resized_image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()</pre>
         </div>
+
       </div>
+
       <div class="cp-sec" id="w4-hw">
         <div class="cp-card">
           <div class="cp-card-title">과제 1 · Zone Plate stride 2·4·8 서브샘플링</div>
@@ -369,74 +539,97 @@ cv2.imwrite('bilinear_diff.jpg',   diff)</pre>
           <pre class="cp-code">import numpy as np
 import cv2
 
-H, W = 512, 512
-y, x = np.indices((H, W))
-r2   = (x - W//2)**2 + (y - H//2)**2
+# Zone Plate 생성
+size = 512
+x = np.arange(size) - size // 2
+y = np.arange(size) - size // 2
+X, Y = np.meshgrid(x, y)
+r2   = X**2 + Y**2
 zone = ((np.cos(r2 / 500.0) + 1) / 2 * 255).astype(np.uint8)
+P, Q = zone.shape
 
+# stride 2, 4, 8로 각각 서브샘플링 → 복원
 for stride in [2, 4, 8]:
     sampled  = zone[::stride, ::stride]
-    restored = cv2.resize(sampled, (W, H),
+    restored = cv2.resize(sampled, (Q, P),
                           interpolation=cv2.INTER_NEAREST)
     cv2.imwrite(f'zone_stride{stride}.jpg', restored)</pre>
         </div>
+
         <div class="cp-card">
-          <div class="cp-card-title">과제 2 · Gaussian Blur 최적값 + 트레이드오프 분석 주석</div>
-          <div class="cp-ok">제출: 파이썬 1개 + 이미지 1개 (코드 안에 분석 주석 필수!)</div>
+          <div class="cp-card-title">과제 2 · Gaussian Blur 최적값 + 트레이드오프 분석</div>
+          <div class="cp-ok">제출: 파이썬 1개 + 이미지 1개 (트레이드오프 분석 주석 필수!)</div>
           <pre class="cp-code">import numpy as np
 import cv2
 
-H, W = 512, 512
-y, x = np.indices((H, W))
-r2   = (x - W//2)**2 + (y - H//2)**2
+size = 512
+x = np.arange(size) - size // 2
+y = np.arange(size) - size // 2
+X, Y = np.meshgrid(x, y)
+r2   = X**2 + Y**2
 zone = ((np.cos(r2 / 500.0) + 1) / 2 * 255).astype(np.uint8)
+P, Q = zone.shape
 
-stride   = 4
-blurred  = cv2.GaussianBlur(zone, (9, 9), sigmaX=3)
+stride = 4
+
+# GaussianBlur 적용 후 서브샘플링 → 복원
+blurred  = cv2.GaussianBlur(zone, (9, 9), 0)
 sampled  = blurred[::stride, ::stride]
-restored = cv2.resize(sampled, (W, H),
+restored = cv2.resize(sampled, (Q, P),
                       interpolation=cv2.INTER_NEAREST)
 cv2.imwrite('zone_gauss_best.jpg', restored)
 
 # [트레이드오프 분석 주석 — 반드시 포함]
-# kernel=(5,5)   sigma=1 : 앨리어싱 많이 남음, 디테일 보존 양호
-# kernel=(9,9)   sigma=3 : 앨리어싱 크게 감소, 디테일 약간 손실  ← 최적
-# kernel=(15,15) sigma=5 : 앨리어싱 거의 없음, 디테일 손실 큼
-# 결론: 커널이 클수록 앨리어싱↓ 디테일↓. (9,9)/sigma=3이 균형점.</pre>
+# kernel=(5,5)   sigma=0 : 블러 약함, 앨리어싱 많이 남음
+# kernel=(9,9)   sigma=0 : 앨리어싱 크게 감소, 디테일 약간 손실 ← 최적
+# kernel=(15,15) sigma=0 : 앨리어싱 거의 없음, 디테일 손실 큼
+# 결론: 커널이 클수록 앨리어싱↓ 디테일↓. (9,9)가 균형점.</pre>
         </div>
+
         <div class="cp-card">
-          <div class="cp-card-title">과제 3 · 수동 Bilinear vs cv2.resize 비교</div>
-          <div class="cp-ok">제출: 파이썬 1개 + 이미지 3개 (수동 결과 / OpenCV 결과 / 차이 이미지)</div>
+          <div class="cp-card-title">과제 3 · 수동 Bilinear vs cv2.INTER_LINEAR 비교</div>
+          <div class="cp-ok">제출: 파이썬 1개 + 이미지 3개 (manual / opencv / diff)</div>
           <pre class="cp-code">import numpy as np
 import cv2
 
-img = cv2.imread('pandas.jpg', cv2.IMREAD_GRAYSCALE).astype(float)
-H, W   = img.shape
-newH, newW = H * 2, W * 2
+img = cv2.imread('pandas.jpg', cv2.IMREAD_GRAYSCALE)
+h, w = img.shape
+new_h, new_w = h * 2, w * 2
 
-manual = np.zeros((newH, newW))
-for ny in range(newH):
-    for nx in range(newW):
-        ox = nx * (W - 1) / (newW - 1)
-        oy = ny * (H - 1) / (newH - 1)
+# ── 수동 Bilinear 보간 ──────────────────────────
+result_manual = np.zeros((new_h, new_w), dtype=np.float64)
+
+for ny in range(new_h):
+    for nx in range(new_w):
+        # 원본 좌표로 역매핑
+        ox = nx * (w - 1) / (new_w - 1)
+        oy = ny * (h - 1) / (new_h - 1)
+
         x0, y0 = int(ox), int(oy)
-        x1 = min(x0 + 1, W - 1)
-        y1 = min(y0 + 1, H - 1)
+        x1 = min(x0 + 1, w - 1)
+        y1 = min(y0 + 1, h - 1)
         tx, ty = ox - x0, oy - y0
+
+        # 가로 보간 2번 → 세로 보간 1번
         r1 = img[y0, x0] * (1 - tx) + img[y0, x1] * tx
         r2 = img[y1, x0] * (1 - tx) + img[y1, x1] * tx
-        manual[ny, nx] = r1 * (1 - ty) + r2 * ty
-manual = manual.astype(np.uint8)
+        result_manual[ny, nx] = r1 * (1 - ty) + r2 * ty
 
-ocv  = cv2.resize(img.astype(np.uint8), (newW, newH),
-                  interpolation=cv2.INTER_LINEAR)
-diff = cv2.absdiff(manual, ocv)
+result_manual = result_manual.astype(np.uint8)
 
-cv2.imwrite('bilinear_manual.jpg', manual)
-cv2.imwrite('bilinear_cv2.jpg',    ocv)
+# ── OpenCV Bilinear ────────────────────────────
+result_cv2 = cv2.resize(img, (new_w, new_h),
+                        interpolation=cv2.INTER_LINEAR)
+
+# ── 두 결과의 차이 이미지 ──────────────────────
+diff = cv2.absdiff(result_manual, result_cv2)
+
+cv2.imwrite('bilinear_manual.jpg', result_manual)
+cv2.imwrite('bilinear_cv2.jpg',    result_cv2)
 cv2.imwrite('bilinear_diff.jpg',   diff)</pre>
         </div>
       </div>
+
       <div class="cp-sec" id="w4-quiz">
         <div class="cp-score-row">
           <div class="cp-sc"><span class="cp-sc-n" id="cq-w4-c">0</span><span class="cp-sc-l">맞음</span></div>
@@ -446,7 +639,6 @@ cv2.imwrite('bilinear_diff.jpg',   diff)</pre>
         <div id="cq-w4-list"></div>
       </div>
     </div>
-
     <button class="btn-ask" onclick="window.open('bilinear_fixed.html','_blank')">보간법 쉽게 보기 ↗</button>
   </div>
 
@@ -458,42 +650,10 @@ cv2.imwrite('bilinear_diff.jpg',   diff)</pre>
       <div class="card-body">히스토그램, 감마 보정, 대비 향상, 히스토그램 평활화를 다룹니다.</div>
     </div>
     <div class="card">
-      <div class="card-title">📊 히스토그램</div>
+      <div class="card-title">⭐ 히스토그램 평활화 공식</div>
       <div class="card-body">
-        <div class="important">📊 히스토그램 = 픽셀 값(0~255)별로 몇 개의 픽셀이 있는지 세어 그래프로 나타낸 것</div>
-        <div class="code-block">import matplotlib.pyplot as plt
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-plt.hist(gray.flatten(), bins=256, range=(0,255))
-plt.show()</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">💡 감마 보정 (Gamma Correction)</div>
-      <div class="card-body">
-        <div class="important">💡 픽셀 값을 지수함수로 변환해 밝기 조절. 히스토그램이 한쪽에 몰린 경우에만 효과적!</div>
-        <div class="code-block">gamma = 0.5  # &lt; 1: 밝게, &gt; 1: 어둡게
-corrected = np.power(img/255.0, gamma) * 255
-corrected = corrected.astype(np.uint8)</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">⭐ 히스토그램 평활화 (Histogram Equalization)</div>
-      <div class="card-body">
-        <div class="important">🎨 픽셀이 특정 범위에만 몰려 있을 때 → 0~255 전체로 고르게 펼쳐주는 것!</div>
         <div class="formula">h(v) = round( (cdf(v) - cdf_min) / (cdf_max - cdf_min) × (L-1) )</div>
-        <div class="code-block"># 수동 구현 (과제 - 내장함수 사용 금지!)
-hist, _ = np.histogram(gray.flatten(), 256, [0,256])
-cdf = hist.cumsum()
-cdf_min = cdf[cdf &gt; 0].min()
-cdf_max = cdf.max()
-L = 256
-
-lut = np.round(
-  (cdf - cdf_min) / (cdf_max - cdf_min) * (L-1)
-).astype(np.uint8)
-
-result = lut[gray]</div>
-        <div class="important">⚠️ 경고: cv2.equalizeHist() 사용하면 미제출 처리!</div>
+        <div class="important">⚠️ cv2.equalizeHist() 사용하면 미제출 처리!</div>
       </div>
     </div>
 
@@ -504,105 +664,103 @@ result = lut[gray]</div>
         <button class="cp-tab" onclick="switchCodeTab('w5','hw',this)">과제 코드</button>
         <button class="cp-tab" onclick="switchCodeTab('w5','quiz',this)">빈칸 퀴즈</button>
       </div>
+
       <div class="cp-sec active" id="w5-lab">
         <div class="cp-card">
-          <div class="cp-card-title">실습 1 · 히스토그램 그리기</div>
+          <div class="cp-card-title">실습 1 · 히스토그램 그리기 — PDF 예제 코드</div>
+          <div class="cp-desc">이미지 픽셀 값의 분포를 확인. ravel()로 1D 변환 후 hist().</div>
           <pre class="cp-code">import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-gray = cv2.imread('bean.jpg', cv2.IMREAD_GRAYSCALE)
+image = cv2.imread('bean.tif', 0)   # 0 = IMREAD_GRAYSCALE
 
-plt.hist(gray.flatten(), bins=256, range=(0, 255))
-plt.xlabel('Pixel value (0~255)')
-plt.ylabel('Count')
-plt.title('Histogram')
-plt.tight_layout()
-plt.show()</pre>
+fig = plt.figure()
+ax0 = fig.add_subplot(211)
+ax0.hist(image.ravel(), 256, [0, 256])   # ravel() = flatten()
+ax1 = fig.add_subplot(212)
+
+plt.show()
+
+cv2.imshow('original', image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()</pre>
+          <div class="cp-desc" style="margin-top:8px">※ ravel()과 flatten() 모두 사용 가능. PDF에서는 ravel() 사용.</div>
         </div>
+
         <div class="cp-card">
-          <div class="cp-card-title">실습 2 · 감마 보정 (Gamma Correction)</div>
-          <div class="cp-desc">gamma &lt; 1 → 어두운 이미지 밝게 / gamma &gt; 1 → 밝은 이미지 어둡게</div>
+          <div class="cp-card-title">실습 2 · 히스토그램 평활화 내장 함수 (참고용)</div>
+          <div class="cp-warn">⚠️ 과제에서 이 코드를 사용하면 미제출 처리! 참고만 하세요.</div>
           <pre class="cp-code">import cv2
 import numpy as np
+import matplotlib.pyplot as plt
 
-gray  = cv2.imread('bean.jpg', cv2.IMREAD_GRAYSCALE)
-gamma = 0.5
+# PDF 예제 코드 (내장 함수 — 과제 사용 금지!)
+image = cv2.imread('bean.tif', 0)
+equ   = cv2.equalizeHist(image)
 
-corrected = np.power(gray / 255.0, gamma) * 255
-corrected = corrected.astype(np.uint8)
+fig = plt.figure()
+ax0 = fig.add_subplot(211)
+ax0.hist(image.ravel(), 256, [0, 256])
+ax1 = fig.add_subplot(212)
+ax1.hist(equ.ravel(),   256, [0, 256])
+plt.show()
 
-cv2.imshow('Original',        gray)
-cv2.imshow('Gamma Corrected', corrected)
+cv2.imshow('original',  image)
+cv2.imshow('after_HE',  equ.astype(np.uint8))
 cv2.waitKey(0)
 cv2.destroyAllWindows()</pre>
         </div>
-        <div class="cp-card">
-          <div class="cp-card-title">실습 3 · 수동 대비 향상 (Contrast Stretching)</div>
-          <pre class="cp-code">import cv2
-import numpy as np
-
-gray = cv2.imread('bean.jpg', cv2.IMREAD_GRAYSCALE).astype(float)
-
-vmin, vmax = gray.min(), gray.max()
-stretched  = (gray - vmin) / (vmax - vmin) * 255
-stretched  = stretched.astype(np.uint8)
-
-cv2.imwrite('stretched.jpg', stretched)</pre>
-        </div>
-        <div class="cp-card">
-          <div class="cp-card-title">실습 4 · 히스토그램 평활화 내장 함수 (참고용)</div>
-          <div class="cp-warn">⚠️ 과제에서 이 함수를 사용하면 미제출 처리! 참고만 하세요.</div>
-          <pre class="cp-code">import cv2
-
-gray      = cv2.imread('bean.jpg', cv2.IMREAD_GRAYSCALE)
-equalized = cv2.equalizeHist(gray)   # 과제 사용 금지!
-cv2.imwrite('equalized_builtin.jpg', equalized)</pre>
-        </div>
       </div>
+
       <div class="cp-sec" id="w5-hw">
         <div class="cp-card">
           <div class="cp-card-title">과제 · 히스토그램 평활화 직접 구현</div>
-          <div class="cp-ok">제출: 파이썬 1개 + 히스토그램 비교 이미지 + 결과 이미지</div>
-          <div class="cp-desc">공식: h(v) = round( (CDF(v) - CDF_min) / (CDF_max - CDF_min) × (L-1) )</div>
+          <div class="cp-ok">제출: 파이썬 1개 + 평활화 전/후 히스토그램 이미지 + 결과 이미지</div>
+          <div class="cp-desc">공식: h(v) = round( (cdf(v) - cdf_min) / (cdf_max - cdf_min) × (L-1) )</div>
           <pre class="cp-code">import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-gray = cv2.imread('bean.jpg', cv2.IMREAD_GRAYSCALE)
-
-# Step 1: 히스토그램 계산
-hist, _ = np.histogram(gray.flatten(), bins=256, range=(0, 256))
-
-# Step 2: CDF (누적합)
-cdf = hist.cumsum()
-
-# Step 3: CDF_min — 0인 구간 제외! / CDF_max
-cdf_min = cdf[cdf > 0].min()
-cdf_max = cdf.max()
+image = cv2.imread('bean.tif', 0)   # 흑백으로 읽기
 L = 256
 
-# Step 4: 공식 적용 → LUT 생성
+# ── Step 1: 히스토그램 계산 ─────────────────────
+hist, _ = np.histogram(image.ravel(), L, [0, L])
+
+# ── Step 2: CDF (누적합) 계산 ───────────────────
+cdf = hist.cumsum()
+
+# ── Step 3: cdf_min (0 제외한 최솟값) ───────────
+cdf_min = cdf[cdf > 0].min()
+cdf_max = cdf.max()    # = 전체 픽셀 수
+
+# ── Step 4: 공식 적용 → LUT 생성 ────────────────
 lut = np.round(
     (cdf - cdf_min) / (cdf_max - cdf_min) * (L - 1)
 ).astype(np.uint8)
 
-# Step 5: LUT를 이미지에 적용
-result = lut[gray]
-cv2.imwrite('he_result.jpg', result)
+# ── Step 5: LUT를 이미지에 적용 ─────────────────
+result = lut[image]
 
-# Step 6: 히스토그램 전/후 비교 저장
-fig, axes = plt.subplots(1, 2, figsize=(10, 3))
-axes[0].hist(gray.flatten(),   bins=256, range=(0, 255))
-axes[0].set_title('Before HE')
-axes[1].hist(result.flatten(), bins=256, range=(0, 255))
-axes[1].set_title('After HE')
+# ── Step 6: 히스토그램 전/후 비교 저장 ──────────
+fig = plt.figure()
+ax0 = fig.add_subplot(211)
+ax0.hist(image.ravel(),  L, [0, L])
+ax0.set_title('Before HE')
+ax1 = fig.add_subplot(212)
+ax1.hist(result.ravel(), L, [0, L])
+ax1.set_title('After HE')
 plt.tight_layout()
 plt.savefig('he_histograms.jpg')
-plt.show()</pre>
-          <div class="cp-warn">cdf_min = cdf[cdf &gt; 0].min() — 0 제외 안 하면 공식이 틀립니다!</div>
+plt.show()
+
+# 결과 이미지 저장
+cv2.imwrite('he_result.jpg', result)</pre>
+          <div class="cp-warn">cdf_min = cdf[cdf &gt; 0].min() — 0인 구간 제외 필수!</div>
         </div>
       </div>
+
       <div class="cp-sec" id="w5-quiz">
         <div class="cp-score-row">
           <div class="cp-sc"><span class="cp-sc-n" id="cq-w5-c">0</span><span class="cp-sc-l">맞음</span></div>
@@ -612,7 +770,6 @@ plt.show()</pre>
         <div id="cq-w5-list"></div>
       </div>
     </div>
-
     <button class="btn-ask" onclick="window.open('histogram_equalization_explainer.html','_blank')">평활화 공식 쉽게 보기 ↗</button>
   </div>
 
@@ -626,46 +783,30 @@ plt.show()</pre>
     <div class="card">
       <div class="card-title">⭐ 주파수 도메인 필터링 전체 절차</div>
       <div class="card-body">
-        <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Zero-padding</strong>: 이미지 크기를 2M × 2N으로 확장 (경계 효과 방지)</div></div>
-        <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Centering</strong>: (-1)^(x+y) 곱해서 저주파를 중심으로 이동</div></div>
-        <div class="step"><div class="step-num">3</div><div class="step-text"><strong>DFT</strong>: 공간 도메인 → 주파수 도메인 변환</div></div>
-        <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Filtering</strong>: G(u,v) = H(u,v) × F(u,v)</div></div>
-        <div class="step"><div class="step-num">5</div><div class="step-text"><strong>Inverse DFT</strong>: 주파수 도메인 → 다시 공간 도메인으로</div></div>
+        <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Zero-padding</strong>: 이미지 M×N → 2M×2N으로 확장</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Centering</strong>: (-1)^(x+y) 곱해서 저주파를 중앙으로 이동</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text"><strong>DFT</strong>: np.fft.fft2()로 주파수 도메인 변환</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Filtering</strong>: G(u,v) = F(u,v) × H(u,v)</div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-text"><strong>Inverse DFT</strong>: np.fft.ifft2() → de-centering → padding 제거</div></div>
       </div>
     </div>
     <div class="card">
-      <div class="card-title">⭐ 필터 공식 정리 — 암기 필수</div>
+      <div class="card-title">⭐ 필터 공식 — 암기 필수</div>
       <div class="card-body">
-        <div style="font-size:0.82rem;font-weight:700;color:var(--text-primary);margin-bottom:6px">Ideal LPF / HPF</div>
-        <div class="formula">LPF: H(u,v) = 1 if D(u,v) ≤ D0, else 0
-HPF: H(u,v) = 1 - H_lpf(u,v)</div>
-        <div style="font-size:0.82rem;font-weight:700;color:var(--text-primary);margin:12px 0 6px">Butterworth LPF (order n)</div>
-        <div class="formula">H(u,v) = 1 / (1 + (D(u,v)/D0)^(2n))
-→ 절단 주파수에서 값이 0.5</div>
-        <div style="font-size:0.82rem;font-weight:700;color:var(--text-primary);margin:12px 0 6px">Gaussian LPF</div>
-        <div class="formula">H(u,v) = e^(-D²(u,v) / 2D0²)</div>
-        <div style="font-size:0.82rem;font-weight:700;color:var(--text-primary);margin:12px 0 6px">Laplacian (주파수 도메인)</div>
+        <div style="font-size:0.82rem;font-weight:700;margin-bottom:6px">Butterworth LPF (order n)</div>
+        <div class="formula">H(u,v) = 1 / (1 + [D(u,v)/D0]^(2n))</div>
+        <div style="font-size:0.82rem;font-weight:700;margin:10px 0 6px">Gaussian LPF</div>
+        <div class="formula">H(u,v) = exp(-D²(u,v) / 2D0²)</div>
+        <div style="font-size:0.82rem;font-weight:700;margin:10px 0 6px">Laplacian</div>
         <div class="formula">H(u,v) = -(u² + v²)
-샤프닝: f(x,y) - g(x,y)
-블러링: f(x,y) + g(x,y)</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">🔬 Homomorphic Filtering — 어려운 내용</div>
-      <div class="card-body">
-        <div class="important">💡 이미지 = 조명(저주파) × 반사율(고주파). 로그를 씌워 곱셈→덧셈으로 바꿔서 각각 처리!</div>
-        <div class="step"><div class="step-num">1</div><div class="step-text">f(x,y) = i(x,y) × r(x,y) → 로그: ln(f) = ln(i) + ln(r)</div></div>
-        <div class="step"><div class="step-num">2</div><div class="step-text">DFT 적용 후 필터링 (조명 약화↓ + 반사율 강화↑)</div></div>
-        <div class="step"><div class="step-num">3</div><div class="step-text">Inverse DFT → 지수함수(exp)로 복원</div></div>
-        <div class="formula">H(u,v) = (γH - γL)(1 - e^(-cD²/D0²)) + γL
-γL &lt; 1, γH &gt; 1</div>
+샤프닝: f(x,y) - g(x,y)  /  블러링: f(x,y) + g(x,y)</div>
       </div>
     </div>
     <div class="card">
       <div class="card-title">📋 Week 6 과제 요약</div>
       <div class="card-body">
-        <div class="step"><div class="step-num">1</div><div class="step-text">sample.jpg에 BLPF(n=2)와 GLPF 구현 (D0=30). 결과 비교 분석 2~3문장 주석으로 작성 → 코드 + 이미지 2개</div></div>
-        <div class="step"><div class="step-num">2</div><div class="step-text">sample.jpg에 Laplacian 필터 적용 후 샤프닝 이미지 생성 → 코드 + 이미지 2개</div></div>
+        <div class="step"><div class="step-num">1</div><div class="step-text">sample.jpg에 BLPF(n=2)와 GLPF (D0=30) 구현. 비교 분석 2~3문장 주석 → 코드 + 이미지 2개</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">sample.jpg에 Laplacian 필터 적용 후 샤프닝 → 코드 + 이미지 2개</div></div>
       </div>
     </div>
 
@@ -676,180 +817,337 @@ HPF: H(u,v) = 1 - H_lpf(u,v)</div>
         <button class="cp-tab" onclick="switchCodeTab('w6','hw',this)">과제 코드</button>
         <button class="cp-tab" onclick="switchCodeTab('w6','quiz',this)">빈칸 퀴즈</button>
       </div>
+
       <div class="cp-sec active" id="w6-lab">
         <div class="cp-card">
-          <div class="cp-card-title">실습 1 · DFT 전체 파이프라인 + 스펙트럼 시각화</div>
-          <div class="cp-desc">Zero-padding → Centering → DFT → 로그 스케일 시각화</div>
+          <div class="cp-card-title">실습 1 · Zero-padding + Centering + DFT — PDF 코드</div>
           <pre class="cp-code">import cv2
 import numpy as np
+import matplotlib.pyplot as plt
 
-img = cv2.imread('sample.jpg', cv2.IMREAD_GRAYSCALE).astype(float)
-M, N = img.shape
+image = cv2.imread('img2.jpg', 0)
+M, N = image.shape
 
-# Step 1: Zero-padding (2M × 2N)
-fp = np.zeros((2*M, 2*N))
-fp[:M, :N] = img
+# Zero-padding: 2M × 2N
+P, Q = 2 * M, 2 * N
+padded_image = np.zeros((P, Q))
+padded_image[:M, :N] = image
 
-# Step 2: Centering — (-1)^(x+y) 곱하기
-xi  = np.arange(2*M).reshape(-1, 1)
-yi  = np.arange(2*N).reshape(1, -1)
-fpc = fp * ((-1) ** (xi + yi))
+plt.imshow(padded_image, cmap='gray'), plt.axis('off')
+plt.show()
 
-# Step 3: DFT
-F = np.fft.fft2(fpc)
+# Centering: (-1)^(x+y) 곱하기
+padded_image_new = np.zeros((P, Q))
+for x in range(P):
+    for y in range(Q):
+        padded_image_new[x, y] = padded_image[x, y] * ((-1) ** (x + y))
 
-# 시각화 (로그 스케일)
-log_mag = np.log1p(np.abs(F))
-vis = (log_mag / log_mag.max() * 255).astype(np.uint8)
-cv2.imwrite('dft_spectrum.jpg', vis)</pre>
+# DFT (FFT 사용)
+dft2d = np.fft.fft2(padded_image_new)
+dft2d_ = np.log(np.abs(dft2d))    # 로그 스케일 시각화
+
+plt.imshow(dft2d_.real, cmap='gray'), plt.axis('off')
+plt.show()</pre>
         </div>
+
         <div class="cp-card">
-          <div class="cp-card-title">실습 2 · Ideal LPF 필터링</div>
-          <pre class="cp-code">import cv2
-import numpy as np
+          <div class="cp-card-title">실습 2 · BLPF 함수 + 필터링 — PDF 코드</div>
+          <pre class="cp-code">import numpy as np
 
-def ideal_lpf(shape, D0):
-    M, N = shape
-    u = np.arange(M) - M // 2
-    v = np.arange(N) - N // 2
-    V, U = np.meshgrid(v, u)
-    return (np.sqrt(U**2 + V**2) &lt;= D0).astype(float)
+# ── BLPF 함수 정의 ─────────────────────────────
+def BLPF(image, order, cutoff):
+    M, N = image.shape
+    H, D = np.zeros((M, N)), np.zeros((M, N))
 
-img = cv2.imread('sample.jpg', cv2.IMREAD_GRAYSCALE).astype(float)
-M, N = img.shape
+    U0 = int(M / 2)
+    V0 = int(N / 2)
 
-fp  = np.zeros((2*M, 2*N));  fp[:M, :N] = img
-xi  = np.arange(2*M).reshape(-1, 1)
-yi  = np.arange(2*N).reshape(1, -1)
-F   = np.fft.fft2(fp * ((-1) ** (xi + yi)))
+    D0 = cutoff
+    n  = order
 
-H = ideal_lpf((2*M, 2*N), D0=30)
-G = F * H
+    # D(u, v) 계산
+    for u in range(M):
+        for v in range(N):
+            u2 = np.power(u, 2)
+            v2 = np.power(v, 2)
+            D[u, v] = np.sqrt(u2 + v2)
 
-g_pad = np.real(np.fft.ifft2(G)) * ((-1) ** (xi + yi))
-g = np.clip(g_pad[:M, :N], 0, 255).astype(np.uint8)
-cv2.imwrite('lpf_result.jpg', g)</pre>
+    # H(u, v) 계산
+    for u in range(M):
+        for v in range(N):
+            u_ = np.abs(u - U0)
+            v_ = np.abs(v - V0)
+            H[u, v] = 1 / (1 + (D[np.abs(u_), np.abs(v_)] / D0) ** (2 * n))
+
+    return H
+
+# ── 메인 코드 ─────────────────────────────────
+# dft2d, padded_image_new 는 실습 1에서 이어서 사용
+lpf = BLPF(dft2d, order=2, cutoff=100)
+plt.imshow(lpf, cmap='gray'), plt.axis('off')
+plt.show()
+
+G     = np.multiply(dft2d, lpf)
+dft2d_ = np.log(np.abs(G))
+plt.imshow(dft2d_.real, cmap='gray'), plt.axis('off')
+plt.show()
+
+# Inverse FFT
+idft2d = np.fft.ifft2(G)</pre>
         </div>
+
         <div class="cp-card">
-          <div class="cp-card-title">실습 3 · Laplacian 필터 + 샤프닝</div>
-          <pre class="cp-code">import cv2
-import numpy as np
+          <div class="cp-card-title">실습 3 · IDFT + De-centering + Padding 제거 — PDF 코드</div>
+          <pre class="cp-code"># idft2d 에서 이어서 작업
 
-img = cv2.imread('sample.jpg', cv2.IMREAD_GRAYSCALE).astype(float)
-M, N = img.shape
+# De-centering: (-1)^(x+y) 다시 곱하기
+for x in range(P):
+    for y in range(Q):
+        idft2d[x, y] = idft2d[x, y] * ((-1) ** (x + y))
 
-fp  = np.zeros((2*M, 2*N));  fp[:M, :N] = img
-xi  = np.arange(2*M).reshape(-1, 1)
-yi  = np.arange(2*N).reshape(1, -1)
-F   = np.fft.fft2(fp * ((-1) ** (xi + yi)))
+# Remove zero-padding part (원본 크기 M×N 만 남기기)
+idft2d = idft2d[:M, :N]
 
-# Laplacian: H(u,v) = -(u² + v²)
-# 중심 (M, N) 기준 좌표
-u = np.arange(2*M) - M
-v = np.arange(2*N) - N
-V, U = np.meshgrid(v, u)
-H_lap = -(U**2 + V**2)
+plt.imshow(idft2d.real, cmap='gray'), plt.axis('off')
+plt.show()</pre>
+        </div>
 
-g_pad = np.real(np.fft.ifft2(F * H_lap)) * ((-1) ** (xi + yi))
-g     = g_pad[:M, :N]
-g_norm = (g - g.min()) / (g.max() - g.min()) * 255
+        <div class="cp-card">
+          <div class="cp-card-title">실습 4 · GLPF 함수 — PDF 코드 (BLPF에서 함수만 교체)</div>
+          <pre class="cp-code">import numpy as np
 
-# 샤프닝: 원본 - 필터 결과
-sharpened = np.clip(img - g_norm, 0, 255).astype(np.uint8)
+def GLPF(image, cutoff):
+    M, N = image.shape
+    H, D = np.zeros((M, N)), np.zeros((M, N))
 
-cv2.imwrite('laplacian_g.jpg', g_norm.astype(np.uint8))
-cv2.imwrite('sharpened.jpg',   sharpened)</pre>
+    U0 = int(M / 2)
+    V0 = int(N / 2)
+
+    D0 = cutoff
+
+    # D(u, v) 계산
+    for u in range(M):
+        for v in range(N):
+            u2 = np.power(u, 2)
+            v2 = np.power(v, 2)
+            D[u, v] = np.sqrt(u2 + v2)
+
+    # Gaussian LPF: H = exp(-D²/2D0²)
+    for u in range(M):
+        for v in range(N):
+            u_ = np.abs(u - U0)
+            v_ = np.abs(v - V0)
+            H[u, v] = np.exp(- D[u_, v_]**2 / (2 * (D0**2)))
+
+    return H
+
+# 사용법: BLPF 대신 GLPF만 교체 ("Replace only function!")
+# lpf = GLPF(dft2d, cutoff=100)</pre>
+          <div class="cp-warn">PDF 강조: "Replace only function!" — BLPF 코드에서 함수 정의 부분만 GLPF로 교체하면 됩니다.</div>
+        </div>
+
+        <div class="cp-card">
+          <div class="cp-card-title">실습 5 · Laplacian 함수 — PDF 코드</div>
+          <pre class="cp-code">import numpy as np
+import matplotlib.pyplot as plt
+
+def Laplacian(image):
+    M, N = image.shape
+    H = np.zeros((M, N))
+
+    # Centering 기준: u - M/2, v - N/2
+    for u in range(M):
+        for v in range(N):
+            u2 = np.power(u - M/2, 2)
+            v2 = np.power(v - N/2, 2)
+            H[u, v] = -(u2 + v2)
+
+    return H
+
+# ── 메인 코드 (dft2d 는 앞에서 계산됨) ──────────
+laplacian = Laplacian(dft2d)
+plt.imshow(laplacian, cmap='gray'), plt.axis('off')
+plt.show()
+
+G      = np.multiply(dft2d, laplacian)
+dft2d_ = np.log(np.abs(G))
+plt.imshow(dft2d_.real, cmap='gray'), plt.axis('off')
+plt.show()
+
+# Inverse Fourier transform
+idft2d = np.fft.ifft2(G)
+
+# De-centering
+for x in range(P):
+    for y in range(Q):
+        idft2d[x, y] = idft2d[x, y] * ((-1) ** (x + y))
+
+# Remove zero-padding
+idft2d = idft2d[:M, :N]
+
+# Normalization: 0~255 범위로
+min_val, max_val = np.min(idft2d), np.max(idft2d)
+idft2d = (idft2d - min_val) / (max_val - min_val) * 255.0
+
+plt.imshow(idft2d.real, cmap='gray'), plt.axis('off')
+plt.show()</pre>
         </div>
       </div>
+
       <div class="cp-sec" id="w6-hw">
         <div class="cp-card">
           <div class="cp-card-title">과제 1 · BLPF vs GLPF 비교 (D0=30)</div>
-          <div class="cp-ok">제출: 코드 1개(분석 주석 포함) + 결과 이미지 2개 (blpf_result.jpg / glpf_result.jpg)</div>
+          <div class="cp-ok">제출: 코드 1개(분석 주석 포함) + 결과 이미지 2개</div>
           <pre class="cp-code">import cv2
 import numpy as np
+import matplotlib.pyplot as plt
 
-# ── DFT 헬퍼 함수 ──────────────────────────────────────
-def dft_forward(img):
-    M, N = img.shape
-    fp   = np.zeros((2*M, 2*N))
-    fp[:M, :N] = img
-    xi = np.arange(2*M).reshape(-1, 1)
-    yi = np.arange(2*N).reshape(1, -1)
-    F  = np.fft.fft2(fp * ((-1) ** (xi + yi)))
-    return F, xi, yi, M, N
+# ── BLPF 함수 ─────────────────────────────────
+def BLPF(image, order, cutoff):
+    M, N = image.shape
+    H, D = np.zeros((M, N)), np.zeros((M, N))
+    U0, V0 = int(M / 2), int(N / 2)
+    D0, n  = cutoff, order
 
-def dft_inverse(G, xi, yi, M, N):
-    g_pad = np.real(np.fft.ifft2(G)) * ((-1) ** (xi + yi))
-    return np.clip(g_pad[:M, :N], 0, 255).astype(np.uint8)
+    for u in range(M):
+        for v in range(N):
+            D[u, v] = np.sqrt(np.power(u, 2) + np.power(v, 2))
 
-# ── D(u,v): 중심(M, N) 기준 거리 행렬 ────────────────
-def compute_D(M, N):
-    u = np.arange(2*M) - M
-    v = np.arange(2*N) - N
-    V, U = np.meshgrid(v, u)
-    return np.sqrt(U**2 + V**2)
+    for u in range(M):
+        for v in range(N):
+            u_ = np.abs(u - U0)
+            v_ = np.abs(v - V0)
+            H[u, v] = 1 / (1 + (D[u_, v_] / D0) ** (2 * n))
 
-# ── BLPF: H = 1 / (1 + (D/D0)^(2n)) ─────────────────
-def blpf(M, N, D0, n=2):
-    D = compute_D(M, N)
-    return 1 / (1 + (D / D0) ** (2 * n))
+    return H
 
-# ── GLPF: H = exp(-D² / 2D0²) ────────────────────────
-def glpf(M, N, D0):
-    D = compute_D(M, N)
-    return np.exp(-D**2 / (2 * D0**2))
+# ── GLPF 함수 ─────────────────────────────────
+def GLPF(image, cutoff):
+    M, N = image.shape
+    H, D = np.zeros((M, N)), np.zeros((M, N))
+    U0, V0 = int(M / 2), int(N / 2)
+    D0     = cutoff
 
-# ── 메인 ─────────────────────────────────────────────
-img = cv2.imread('sample.jpg', cv2.IMREAD_GRAYSCALE).astype(float)
-F, xi, yi, M, N = dft_forward(img)
+    for u in range(M):
+        for v in range(N):
+            D[u, v] = np.sqrt(np.power(u, 2) + np.power(v, 2))
+
+    for u in range(M):
+        for v in range(N):
+            u_ = np.abs(u - U0)
+            v_ = np.abs(v - V0)
+            H[u, v] = np.exp(- D[u_, v_]**2 / (2 * (D0**2)))
+
+    return H
+
+# ── 공통 전처리 ───────────────────────────────
+image = cv2.imread('sample.jpg', 0)
+M, N  = image.shape
+P, Q  = 2 * M, 2 * N
+
+# Zero-padding
+padded = np.zeros((P, Q))
+padded[:M, :N] = image
+
+# Centering
+padded_c = np.zeros((P, Q))
+for x in range(P):
+    for y in range(Q):
+        padded_c[x, y] = padded[x, y] * ((-1) ** (x + y))
+
+# DFT
+dft2d = np.fft.fft2(padded_c)
+
+# ── 필터 적용 및 역변환 공통 함수 ──────────────
+def apply_filter_and_save(dft2d, H, filename, M, N, P, Q):
+    G      = np.multiply(dft2d, H)
+    idft2d = np.fft.ifft2(G)
+
+    for x in range(P):
+        for y in range(Q):
+            idft2d[x, y] = idft2d[x, y] * ((-1) ** (x + y))
+
+    result = idft2d[:M, :N].real
+    min_v, max_v = result.min(), result.max()
+    result = ((result - min_v) / (max_v - min_v) * 255).astype(np.uint8)
+    cv2.imwrite(filename, result)
+    return result
+
+# D0 = 30
 D0 = 30
+H_blpf = BLPF(dft2d, order=2, cutoff=D0)
+H_glpf = GLPF(dft2d, cutoff=D0)
 
-for name, H in [('blpf', blpf(M, N, D0, n=2)),
-                ('glpf', glpf(M, N, D0))]:
-    out = dft_inverse(F * H, xi, yi, M, N)
-    cv2.imwrite(f'{name}_result.jpg', out)
+res_blpf = apply_filter_and_save(dft2d, H_blpf, 'blpf_result.jpg', M, N, P, Q)
+res_glpf = apply_filter_and_save(dft2d, H_glpf, 'glpf_result.jpg', M, N, P, Q)
 
 # [분석 주석 — 반드시 포함]
 # BLPF (n=2, D0=30):
 #   엣지 경계가 비교적 선명하게 유지됨.
 #   링잉(ringing) 아티팩트가 엣지 근처에서 약간 발생.
 # GLPF (D0=30):
-#   엣지가 더 부드럽게 번지고 전환이 점진적.
-#   링잉 아티팩트 없음. 더 자연스러운 블러 효과.
-# 결론: BLPF가 더 선명하지만 링잉 있고,
-#        GLPF는 부드럽지만 흐림이 약간 더 많음.</pre>
+#   엣지가 더 부드럽게 번지며 전환이 점진적.
+#   링잉 아티팩트 없음. 전반적으로 자연스러운 블러 효과.
+# 결론: 동일 D0에서 BLPF가 더 선명하지만 링잉 있고,
+#        GLPF는 부드럽지만 약간 더 많은 흐림이 발생.</pre>
         </div>
+
         <div class="cp-card">
           <div class="cp-card-title">과제 2 · Laplacian 샤프닝</div>
           <div class="cp-ok">제출: 코드 1개 + 이미지 2개 (laplacian_filtered.jpg / sharpened_result.jpg)</div>
           <pre class="cp-code">import cv2
 import numpy as np
 
-img = cv2.imread('sample.jpg', cv2.IMREAD_GRAYSCALE).astype(float)
-M, N = img.shape
+def Laplacian(image):
+    M, N = image.shape
+    H = np.zeros((M, N))
+    for u in range(M):
+        for v in range(N):
+            u2 = np.power(u - M/2, 2)
+            v2 = np.power(v - N/2, 2)
+            H[u, v] = -(u2 + v2)
+    return H
 
-fp  = np.zeros((2*M, 2*N));  fp[:M, :N] = img
-xi  = np.arange(2*M).reshape(-1, 1)
-yi  = np.arange(2*N).reshape(1, -1)
-F   = np.fft.fft2(fp * ((-1) ** (xi + yi)))
+# 전처리 (Zero-padding + Centering)
+image = cv2.imread('sample.jpg', 0)
+M, N  = image.shape
+P, Q  = 2 * M, 2 * N
 
-# Laplacian: H(u,v) = -(u² + v²)
-u = np.arange(2*M) - M
-v = np.arange(2*N) - N
-V, U   = np.meshgrid(v, u)
-H_lap  = -(U**2 + V**2)
+padded = np.zeros((P, Q))
+padded[:M, :N] = image
 
-g_pad  = np.real(np.fft.ifft2(F * H_lap)) * ((-1) ** (xi + yi))
-g      = g_pad[:M, :N]
-g_norm = (g - g.min()) / (g.max() - g.min()) * 255
+padded_c = np.zeros((P, Q))
+for x in range(P):
+    for y in range(Q):
+        padded_c[x, y] = padded[x, y] * ((-1) ** (x + y))
+
+dft2d = np.fft.fft2(padded_c)
+
+# Laplacian 필터 적용
+H_lap = Laplacian(dft2d)
+G     = np.multiply(dft2d, H_lap)
+
+# Inverse DFT
+idft2d = np.fft.ifft2(G)
+for x in range(P):
+    for y in range(Q):
+        idft2d[x, y] = idft2d[x, y] * ((-1) ** (x + y))
+
+idft2d = idft2d[:M, :N].real
+
+# 정규화: 0~255
+min_v, max_v = np.min(idft2d), np.max(idft2d)
+g = (idft2d - min_v) / (max_v - min_v) * 255.0
 
 # 샤프닝: f(x,y) - g(x,y)
-sharpened = np.clip(img - g_norm, 0, 255).astype(np.uint8)
+f         = image.astype(np.float64)
+sharpened = np.clip(f - g, 0, 255).astype(np.uint8)
 
-cv2.imwrite('laplacian_filtered.jpg', g_norm.astype(np.uint8))
+cv2.imwrite('laplacian_filtered.jpg', g.astype(np.uint8))
 cv2.imwrite('sharpened_result.jpg',   sharpened)</pre>
         </div>
       </div>
+
       <div class="cp-sec" id="w6-quiz">
         <div class="cp-score-row">
           <div class="cp-sc"><span class="cp-sc-n" id="cq-w6-c">0</span><span class="cp-sc-l">맞음</span></div>
@@ -859,7 +1157,6 @@ cv2.imwrite('sharpened_result.jpg',   sharpened)</pre>
         <div id="cq-w6-list"></div>
       </div>
     </div>
-
     <button class="btn-ask" onclick="window.open('homomorphic_filtering_explainer.html','_blank')">호모모픽 쉽게 보기 ↗</button>
   </div>
 
@@ -874,20 +1171,16 @@ cv2.imwrite('sharpened_result.jpg',   sharpened)</pre>
     <div id="quiz-container"></div>
   </div>
 
-</div><!-- /page-wrap -->
+</div>
 
 <script src="script.js"></script>
-
 <script>
-/* ── 토글: 코드 패널 열기/닫기 ── */
+/* ── 토글 ── */
 function toggleCode(panelId) {
   var panel  = document.getElementById(panelId);
   var isOpen = panel.classList.toggle('open');
   var btn    = panel.previousElementSibling;
-  btn.innerHTML = btn.innerHTML.replace(
-    isOpen ? '▾' : '▴',
-    isOpen ? '▴' : '▾'
-  );
+  btn.innerHTML = btn.innerHTML.replace(isOpen ? '▾' : '▴', isOpen ? '▴' : '▾');
 }
 
 /* ── 내부 탭 전환 ── */
@@ -899,117 +1192,116 @@ function switchCodeTab(wk, secId, clickedBtn) {
   clickedBtn.classList.add('active');
 }
 
-/* ── 코드 퀴즈 데이터 ── */
+/* ── 코드 빈칸 퀴즈 데이터 — PDF 코드 기반 ── */
 var cqData = {
   w4: [
     {
-      q:    'Zone Plate를 stride 간격으로 샘플링 (행·열 모두 동일 간격)',
-      tmpl: 'sampled = zone[::___A___, ::___A___]',
-      ans:  { A: 'stride' },
-      hint: { A: '행과 열 모두 같은 간격 변수명' },
-      exp:  'zone[::stride, ::stride] — 행과 열 모두 stride 간격으로 픽셀 선택.'
+      q: 'Zone Plate 서브샘플링: stride 간격으로 행·열 샘플링 후 원본 크기(Q, P)로 복원',
+      tmpl: 'sampled  = zone[::___A___, ::stride]\nrestored = cv2.resize(sampled, (___B___, P),\n                      interpolation=cv2.INTER_NEAREST)',
+      ans:  { A: 'stride', B: 'Q' },
+      hint: { A: '행과 열 모두 같은 간격 변수', B: 'cv2.resize 크기 인자는 (width, height) = (열수, 행수)' },
+      exp:  'zone[::stride, ::stride]로 샘플링. cv2.resize(sampled, (Q, P))에서 Q=열(가로), P=행(세로).'
     },
     {
-      q:    'GaussianBlur 적용: 커널 (9,9), sigma=0 (자동 계산)',
-      tmpl: 'blurred = cv2.___A___(zone, (9, 9), ___B___)',
-      ans:  { A: 'GaussianBlur', B: '0' },
-      hint: { A: '가우시안 블러 OpenCV 함수명', B: 'sigma=0이면 커널 크기로 자동 계산' },
+      q: 'GaussianBlur 적용: 커널 (9,9), sigma=0',
+      tmpl: 'blurred = cv2.GaussianBlur(zone, (9, 9), ___A___)',
+      ans:  { A: '0' },
+      hint: { A: 'sigma=0이면 커널 크기로 자동 계산' },
       exp:  'cv2.GaussianBlur(src, ksize, sigmaX). sigmaX=0은 ksize 기반 자동 sigma.'
     },
     {
-      q:    'Bilinear 가로 보간: y0행의 x0, x1 두 픽셀을 tx 비율로 혼합',
+      q: 'Bilinear 가로 보간: x0, x1 두 픽셀을 tx 비율로 혼합',
       tmpl: 'r1 = img[y0, x0] * (1 - ___A___) + img[y0, x1] * ___A___',
       ans:  { A: 'tx' },
       hint: { A: '가로 방향 소수점 비율 (0~1)' },
       exp:  '선형 보간: a*(1-t)+b*t. tx = ox - x0 (소수 부분).'
     },
     {
-      q:    'sampled를 원본 크기로 Nearest Neighbor 보간으로 복원',
-      tmpl: 'restored = cv2.resize(sampled, (W, H),\n    interpolation=cv2.___A___)',
-      ans:  { A: 'INTER_NEAREST' },
-      hint: { A: 'Nearest Neighbor 보간 상수' },
-      exp:  'cv2.INTER_NEAREST = Nearest Neighbor 보간. 가장 가까운 픽셀 값을 그대로 사용.'
+      q: 'cv2.resize Bilinear 보간 상수',
+      tmpl: 'result_cv2 = cv2.resize(img, (new_w, new_h),\n                        interpolation=cv2.___A___)',
+      ans:  { A: 'INTER_LINEAR' },
+      hint: { A: 'Bilinear 보간 OpenCV 상수' },
+      exp:  'INTER_LINEAR = Bilinear 보간. INTER_NEAREST = Nearest Neighbor.'
     }
   ],
   w5: [
     {
-      q:    'np.histogram에 2D 이미지를 입력하려면 먼저 1D로 변환',
-      tmpl: 'hist, _ = np.histogram(gray.___A___(), 256, [0, 256])',
-      ans:  { A: 'flatten' },
-      hint: { A: '2D 배열을 1D로 펼치는 NumPy 메서드' },
-      exp:  'flatten()으로 (H,W) 배열 → 1D 배열 변환 후 histogram 계산.'
+      q: 'PDF 예제 코드: image.ravel()로 1D 변환 후 히스토그램',
+      tmpl: 'ax0.hist(image.___A___(), 256, [0, 256])',
+      ans:  { A: 'ravel' },
+      hint: { A: 'flatten()과 같은 역할. PDF에서 사용하는 메서드' },
+      exp:  'ravel()과 flatten() 모두 2D→1D 변환. PDF 예제 코드는 ravel() 사용.'
     },
     {
-      q:    'hist로부터 CDF(누적 분포 함수) 계산',
+      q: 'CDF(누적합) 계산',
       tmpl: 'cdf = hist.___A___()',
       ans:  { A: 'cumsum' },
-      hint: { A: 'cumulative sum — 왼쪽부터 누적합산' },
-      exp:  'cumsum()은 배열을 왼쪽부터 누적으로 더해나가는 함수.'
+      hint: { A: 'cumulative sum 메서드' },
+      exp:  'cumsum()은 왼쪽부터 누적합산.'
     },
     {
-      q:    'CDF_min: CDF 중 0인 구간을 제외한 최솟값',
+      q: 'CDF_min: 0인 구간 제외하고 최솟값',
       tmpl: 'cdf_min = cdf[cdf > ___A___].___B___()',
       ans:  { A: '0', B: 'min' },
       hint: { A: '0보다 큰 값만 필터링', B: '최솟값 메서드' },
       exp:  'cdf[cdf>0].min() — 픽셀이 없는 구간(CDF=0)은 반드시 제외.'
     },
     {
-      q:    '평활화 공식으로 LUT 생성 후 이미지에 적용',
+      q: 'LUT 공식 적용 후 이미지에 적용',
       tmpl: 'lut = np.round(\n    (cdf - cdf_min) / (cdf_max - cdf_min) * ___A___\n).astype(np.uint8)\nresult = lut[___B___]',
-      ans:  { A: '255', B: 'gray' },
-      hint: { A: 'L-1 = 최대 픽셀 값 (256-1)', B: 'LUT를 적용할 원본 이미지 변수' },
-      exp:  'L-1=255. lut[gray]로 gray의 각 픽셀 값을 LUT 인덱스로 변환.'
+      ans:  { A: '(L - 1)', B: 'image' },
+      hint: { A: 'L=256이므로 L-1=255. 괄호 포함 표현', B: '원본 이미지 변수명 (PDF 기준)' },
+      exp:  '(L-1)=255. lut[image]로 각 픽셀 값을 LUT로 변환.'
     }
   ],
   w6: [
     {
-      q:    'Zero-padding: 원본 이미지를 2M×2N 배열의 왼쪽 위 영역에 복사',
-      tmpl: 'fp = np.zeros((2*M, 2*N))\nfp[___A___, ___B___] = img',
+      q: 'Zero-padding: padded_image에 원본 이미지 복사',
+      tmpl: 'padded_image = np.zeros((P, Q))\npadded_image[___A___, ___B___] = image',
       ans:  { A: ':M', B: ':N' },
-      hint: { A: '0번째부터 M번째 행까지', B: '0번째부터 N번째 열까지' },
-      exp:  'fp[:M, :N] = img — 왼쪽 위 M×N 영역에 원본 복사, 나머지는 0.'
+      hint: { A: '0~M 행 슬라이싱', B: '0~N 열 슬라이싱' },
+      exp:  'padded_image[:M, :N] = image — 왼쪽 위 M×N 영역에 원본 복사.'
     },
     {
-      q:    'Centering: (-1)^(x+y)를 곱해 저주파를 스펙트럼 중앙으로 이동',
-      tmpl: 'fpc = fp * (___A___ ** (xi + yi))',
+      q: 'Centering: PDF 코드 방식 — for 루프로 (-1)^(x+y) 곱하기',
+      tmpl: 'for x in range(P):\n    for y in range(Q):\n        padded_image_new[x, y] = padded_image[x, y] * (___A___ ** (x + y))',
       ans:  { A: '(-1)' },
       hint: { A: '부호를 교대로 바꾸는 수' },
-      exp:  '(-1)^(x+y) 체커보드 패턴 — 이를 곱하면 DFT 결과의 저주파가 중앙으로 이동.'
+      exp:  '(-1)^(x+y) — x+y가 짝수면 +1, 홀수면 -1. 저주파를 중앙으로 이동.'
     },
     {
-      q:    'Butterworth LPF: H = 1 / (1 + (D/D0)^(2n))',
-      tmpl: 'H = 1 / (1 + (D / ___A___) ** (2 * ___B___))',
-      ans:  { A: 'D0', B: 'n' },
-      hint: { A: 'cutoff frequency 변수', B: '필터 차수(order) 변수' },
-      exp:  'BLPF: 1/(1+(D/D0)^2n). D0에서 H=0.5. n=2가 일반적 기본값.'
+      q: 'BLPF: D(u,v) 계산 시 centering 기준 (U0, V0)',
+      tmpl: 'U0 = int(M / 2)\nV0 = int(N / 2)\n...\nu_ = np.abs(u - ___A___)\nv_ = np.abs(v - ___B___)\nH[u, v] = 1 / (1 + (D[u_, v_] / D0) ** (2 * n))',
+      ans:  { A: 'U0', B: 'V0' },
+      hint: { A: '행 방향 중심 좌표', B: '열 방향 중심 좌표' },
+      exp:  'PDF BLPF/GLPF 함수에서 u_=|u-U0|, v_=|v-V0|로 중심 기준 거리 계산.'
     },
     {
-      q:    'Gaussian LPF: H = exp(-D²/2D0²)',
-      tmpl: 'H = np.___A___(-D**2 / (2 * D0**___B___))',
-      ans:  { A: 'exp', B: '2' },
-      hint: { A: 'e^x를 계산하는 NumPy 함수', B: 'D0의 제곱' },
-      exp:  'GLPF: np.exp(-D²/(2*D0²)). D0**2로 제곱 계산.'
+      q: 'Laplacian 필터: u - M/2, v - N/2 기준으로 H(u,v) = -(u² + v²)',
+      tmpl: 'u2 = np.power(u - ___A___, 2)\nv2 = np.power(v - ___B___, 2)\nH[u, v] = -(u2 + v2)',
+      ans:  { A: 'M/2', B: 'N/2' },
+      hint: { A: '행 방향 중심값', B: '열 방향 중심값' },
+      exp:  'Laplacian 함수에서 centering 기준: u-M/2, v-N/2.'
     },
     {
-      q:    'Laplacian 필터 H(u,v)=-(u²+v²), 샤프닝은 원본에서 필터 결과를 뺌',
-      tmpl: 'H_lap = -(___A___**2 + V**2)\n...\nsharpened = img ___B___ g_norm',
-      ans:  { A: 'U', B: '-' },
-      hint: { A: '가로 주파수 좌표 변수', B: '샤프닝 = 원본 - 필터 결과' },
-      exp:  'H=-(U²+V²). 샤프닝=f-g(원본에서 빼기), 블러링=f+g(더하기).'
+      q: 'Laplacian 결과 정규화: 0~255 범위로',
+      tmpl: 'min_val, max_val = np.min(idft2d), np.max(idft2d)\nidft2d = (idft2d - ___A___) / (___B___ - min_val) * 255.0',
+      ans:  { A: 'min_val', B: 'max_val' },
+      hint: { A: '최솟값 변수', B: '최댓값 변수' },
+      exp:  '정규화 공식: (x - min) / (max - min) * 255.'
     },
     {
-      q:    'IDFT 후 de-centering 적용 + zero-padding 제거',
-      tmpl: 'g_pad = np.real(np.fft.___A___(G)) * ((-1) ** (xi + yi))\ng = g_pad[___B___, :N]',
-      ans:  { A: 'ifft2', B: ':M' },
-      hint: { A: '2D Inverse FFT 함수', B: '원본 M행까지 슬라이싱으로 패딩 제거' },
-      exp:  'ifft2()로 역변환 후 (-1)^(x+y) 곱해 de-centering. [:M,:N]으로 패딩 제거.'
+      q: 'Laplacian 샤프닝: 원본에서 필터 결과를 뺌',
+      tmpl: 'sharpened = np.clip(___A___ - g, 0, 255).astype(np.uint8)',
+      ans:  { A: 'f' },
+      hint: { A: '원본 이미지를 float로 변환한 변수 (f = image.astype(np.float64))' },
+      exp:  '샤프닝 = f(x,y) - g(x,y). 블러링 = f(x,y) + g(x,y).'
     }
   ]
 };
 
 var cqState = {};
 
-/* ── 퀴즈 HTML 생성 ── */
 function buildCQ() {
   ['w4', 'w5', 'w6'].forEach(function(wk) {
     var container = document.getElementById('cq-' + wk + '-list');
@@ -1057,12 +1349,12 @@ function cqCheck(id, wk, qi) {
   var fb   = document.getElementById('cqfb-' + id);
   var card = document.getElementById('cqi-card-' + id);
   if (allOk) {
-    fb.className   = 'cq-fb show ok3';
+    fb.className = 'cq-fb show ok3';
     fb.textContent = '✓ 정답! ' + q.exp;
     card.className = 'cq-item ok-card';
   } else {
     var hints = wrong.map(function(k) { return '[' + k + '] ' + q.hint[k]; }).join(' / ');
-    fb.className   = 'cq-fb show ng3';
+    fb.className = 'cq-fb show ng3';
     fb.textContent = '✗ 틀렸어요. 힌트: ' + hints + ' | 해설: ' + q.exp;
     card.className = 'cq-item ng-card';
   }
@@ -1070,10 +1362,10 @@ function cqCheck(id, wk, qi) {
 }
 
 function cqHint(id, wk, qi) {
-  var q = cqData[wk][qi];
+  var q  = cqData[wk][qi];
   var fb = document.getElementById('cqfb-' + id);
   var hints = Object.keys(q.hint).map(function(k) { return '[' + k + '] ' + q.hint[k]; }).join(' / ');
-  fb.className   = 'cq-fb show hint3';
+  fb.className = 'cq-fb show hint3';
   fb.textContent = '💡 힌트: ' + hints;
 }
 
