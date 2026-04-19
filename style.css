@@ -336,11 +336,13 @@ code {
   color: var(--accent-dark);
   margin-top: 10px;
   transition: all 0.2s ease;
+  text-decoration: none; /* <a> 태그 밑줄 제거 */
 }
 .btn-ask:hover {
   background: linear-gradient(135deg, #C4BCEE, #AECDFA);
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
+  color: var(--accent-dark);
 }
 
 /* ── Quiz ── */
