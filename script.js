@@ -163,13 +163,6 @@ function showTab(id, el) {
   if (el) el.classList.add('active');
 }
 
-/* ── Ask Button ── */
-function sendPrompt(text) {
-  if (typeof window.sendPrompt === 'function') {
-    window.sendPrompt(text);
-  }
-}
-
 /* ── Init ── */
 document.addEventListener('DOMContentLoaded', () => {
   buildQuiz();
