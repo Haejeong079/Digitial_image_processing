@@ -1,344 +1,201 @@
-
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-.wrap{padding:1rem 0;font-family:var(--font-sans)}
-.sec-title{font-size:13px;font-weight:500;color:var(--color-text-secondary);letter-spacing:.04em;text-transform:uppercase;margin:1.5rem 0 .75rem}
-.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:10px}
-.card-head{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px;display:flex;align-items:center;gap:8px}
-.card-sub{font-size:13px;color:var(--color-text-secondary);line-height:1.7}
-.analogy{background:#EEEDFE;border-left:3px solid #534AB7;border-radius:0;padding:10px 14px;margin:10px 0;font-size:13px;color:#3C3489;line-height:1.7}
-.warn{background:#FAEEDA;border-left:3px solid #854F0B;border-radius:0;padding:10px 14px;margin:10px 0;font-size:13px;color:#633806;line-height:1.7}
-.ok{background:#EAF3DE;border-left:3px solid #3B6D11;border-radius:0;padding:10px 14px;margin:10px 0;font-size:13px;color:#27500A;line-height:1.7}
-code{font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:2px 5px;border-radius:4px;color:var(--color-text-primary)}
-.codeblock{font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:10px 14px;border-radius:var(--border-radius-md);color:var(--color-text-primary);line-height:1.7;white-space:pre;overflow-x:auto;margin:8px 0}
-.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:var(--border-radius-md);font-weight:500;margin-right:4px}
-.tag-p{background:#EEEDFE;color:#3C3489}
-.tag-w{background:#FAEEDA;color:#633806}
-.tag-g{background:#EAF3DE;color:#27500A}
-
-.box-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:10px 0}
-.box{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px;text-align:center}
-.box-num{font-size:20px;font-weight:500;color:#534AB7}
-.box-label{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
-
-.list-sim{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px;margin:8px 0;display:flex;gap:0;overflow:hidden}
-.list-cell{flex:1;text-align:center;padding:10px 4px;border-right:0.5px solid var(--color-border-tertiary)}
-.list-cell:last-child{border-right:none}
-.list-idx{font-size:10px;color:var(--color-text-tertiary);margin-bottom:4px}
-.list-val{font-size:16px;font-weight:500;color:var(--color-text-primary)}
-.list-cell.highlight{background:#EEEDFE}
-.list-cell.highlight .list-val{color:#3C3489}
-.list-cell.highlight .list-idx{color:#7F77DD}
-
-.slicer{margin:12px 0}
-.slicer label{font-size:13px;color:var(--color-text-secondary);display:block;margin-bottom:6px}
-.slicer-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.slicer-row input{width:60px}
-.slicer-out{font-size:13px;font-family:var(--font-mono);color:#534AB7;font-weight:500}
-
-.matrix-wrap{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;margin:10px 0}
-.matrix{display:inline-grid;gap:4px;background:var(--color-background-secondary);padding:10px;border-radius:var(--border-radius-md)}
-.m-cell{width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--color-text-primary);border-radius:4px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary)}
-.m-cell.hl{background:#EEEDFE;color:#3C3489;border-color:#AFA9EC}
-.op-label{font-size:22px;color:var(--color-text-tertiary);align-self:center}
-.matrix-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:4px;text-align:center}
-
-.tabs2{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
-.tab2{padding:5px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary)}
-.tab2.on{background:#534AB7;color:#EEEDFE;border-color:#534AB7}
-.tsec{display:none}.tsec.on{display:block}
-
-.ocv-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
-.ocv-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px}
-.ocv-card h4{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
-.ocv-card p{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
-@media(max-width:480px){.ocv-row{grid-template-columns:1fr}}
-</style>
-
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Week 2 Python 기초 쉽게 이해하기</title>
+  <link rel="stylesheet" href="explainer.css" />
+</head>
+<body>
 <div class="wrap">
 
-<div class="tabs2">
-  <button class="tab2 on" onclick="sw(this,'t1')">리스트 완전정복</button>
-  <button class="tab2" onclick="sw(this,'t2')">NumPy 행렬 곱</button>
-  <button class="tab2" onclick="sw(this,'t3')">OpenCV BGR 주의</button>
-  <button class="tab2" onclick="sw(this,'t4')">for / while 문</button>
-</div>
+  <a class="back-btn" href="index.html">← 돌아가기</a>
 
-<div class="tsec on" id="t1">
-  <div class="sec-title">리스트 — 헷갈리는 포인트 3가지</div>
-
-  <div class="card">
-    <div class="card-head"><span class="tag tag-p">포인트 1</span> 인덱스는 0부터!</div>
-    <div class="card-sub">아래 리스트를 클릭해서 각 칸의 인덱스를 확인해보세요.</div>
-    <div class="list-sim" id="list-display">
-      <div class="list-cell" onclick="hl(0)"><div class="list-idx">인덱스 0</div><div class="list-val">10</div></div>
-      <div class="list-cell" onclick="hl(1)"><div class="list-idx">인덱스 1</div><div class="list-val">20</div></div>
-      <div class="list-cell" onclick="hl(2)"><div class="list-idx">인덱스 2</div><div class="list-val">30</div></div>
-      <div class="list-cell" onclick="hl(3)"><div class="list-idx">인덱스 3</div><div class="list-val">40</div></div>
-      <div class="list-cell" onclick="hl(4)"><div class="list-idx">인덱스 4</div><div class="list-val">50</div></div>
-    </div>
-    <div id="hl-result" style="font-size:13px;color:#534AB7;font-family:var(--font-mono);min-height:20px;margin-top:4px"></div>
-    <div class="analogy">비유: 아파트 1동의 호수가 101호, 102호… 가 아니라 100호, 101호… 처럼 0부터 시작한다고 생각하세요!</div>
+  <div class="page-header">
+    <h1>🐍 Week 2 Python 기초 완전 정복</h1>
+    <p>리스트 · NumPy · OpenCV · 반복문 헷갈리는 포인트만 쏙쏙</p>
   </div>
 
-  <div class="card">
-    <div class="card-head"><span class="tag tag-w">포인트 2</span> 슬라이싱 — end는 포함 안 됨!</div>
-    <div class="card-sub"><code>a[start:end]</code> → start 이상, end <b>미만</b>까지만!</div>
-    <div class="slicer">
-      <label>start: <input type="range" min="0" max="4" value="1" step="1" id="sl-s" oninput="sliceUpdate()"> <span id="sl-sv">1</span></label>
-      <label>end: <input type="range" min="1" max="5" value="3" step="1" id="sl-e" oninput="sliceUpdate()"> <span id="sl-ev">3</span></label>
-    </div>
-    <div class="list-sim" id="slice-list">
-      <div class="list-cell" id="sc0"><div class="list-idx">0</div><div class="list-val">10</div></div>
-      <div class="list-cell" id="sc1"><div class="list-idx">1</div><div class="list-val">20</div></div>
-      <div class="list-cell" id="sc2"><div class="list-idx">2</div><div class="list-val">30</div></div>
-      <div class="list-cell" id="sc3"><div class="list-idx">3</div><div class="list-val">40</div></div>
-      <div class="list-cell" id="sc4"><div class="list-idx">4</div><div class="list-val">50</div></div>
-    </div>
-    <div id="slice-result" style="font-size:13px;color:#534AB7;font-family:var(--font-mono);margin-top:6px"></div>
-    <div class="warn">a[1:3] 은 인덱스 1, 2만 가져옵니다. 3번은 포함되지 않아요!</div>
+  <div class="tabs2">
+    <button class="tab2 on" onclick="sw(this,'t1')">리스트 완전정복</button>
+    <button class="tab2"    onclick="sw(this,'t2')">NumPy 행렬 곱</button>
+    <button class="tab2"    onclick="sw(this,'t3')">OpenCV BGR 주의</button>
+    <button class="tab2"    onclick="sw(this,'t4')">for / while 문</button>
   </div>
 
-  <div class="card">
-    <div class="card-head"><span class="tag tag-g">포인트 3</span> + 는 붙이기, * 는 반복 — 빼기/나누기는 안 됨</div>
-    <div class="codeblock">a = [1, 2, 3]
+  <!-- 리스트 -->
+  <div class="tsec on" id="t1">
+    <div class="sec-title">리스트 — 헷갈리는 포인트 3가지</div>
+    <div class="card">
+      <div class="card-head"><span class="tag tag-p">포인트 1</span> 인덱스는 0부터!</div>
+      <div class="card-sub">아래 리스트를 클릭해서 각 칸의 인덱스를 확인해보세요.</div>
+      <div class="list-sim" id="list-display">
+        <div class="list-cell" onclick="hl(0)"><div class="list-idx">인덱스 0</div><div class="list-val">10</div></div>
+        <div class="list-cell" onclick="hl(1)"><div class="list-idx">인덱스 1</div><div class="list-val">20</div></div>
+        <div class="list-cell" onclick="hl(2)"><div class="list-idx">인덱스 2</div><div class="list-val">30</div></div>
+        <div class="list-cell" onclick="hl(3)"><div class="list-idx">인덱스 3</div><div class="list-val">40</div></div>
+        <div class="list-cell" onclick="hl(4)"><div class="list-idx">인덱스 4</div><div class="list-val">50</div></div>
+      </div>
+      <div id="hl-result" style="font-size:0.82rem;color:#534AB7;font-family:'Fira Code',Consolas,monospace;min-height:20px;margin-top:6px;font-weight:700"></div>
+      <div class="analogy-box">비유: 아파트 호수가 101호, 102호가 아니라 100호, 101호처럼 0부터 시작한다고 생각하세요!</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag tag-w">포인트 2</span> 슬라이싱 — end는 포함 안 됨!</div>
+      <div class="card-sub"><code>a[start:end]</code> → start 이상, end <b>미만</b>까지만!</div>
+      <div class="slicer">
+        <label>start: <input type="range" min="0" max="4" value="1" step="1" id="sl-s"> <span id="sl-sv" style="font-weight:700;color:#534AB7">1</span></label>
+        <label>end: <input type="range" min="1" max="5" value="3" step="1" id="sl-e"> <span id="sl-ev" style="font-weight:700;color:#534AB7">3</span></label>
+      </div>
+      <div class="list-sim" id="slice-list">
+        <div class="list-cell" id="sc0"><div class="list-idx">0</div><div class="list-val">10</div></div>
+        <div class="list-cell" id="sc1"><div class="list-idx">1</div><div class="list-val">20</div></div>
+        <div class="list-cell" id="sc2"><div class="list-idx">2</div><div class="list-val">30</div></div>
+        <div class="list-cell" id="sc3"><div class="list-idx">3</div><div class="list-val">40</div></div>
+        <div class="list-cell" id="sc4"><div class="list-idx">4</div><div class="list-val">50</div></div>
+      </div>
+      <div id="slice-result" style="font-size:0.82rem;color:#534AB7;font-family:'Fira Code',Consolas,monospace;margin-top:8px;font-weight:700"></div>
+      <div class="warn-box">a[1:3] 은 인덱스 1, 2만 가져옵니다. 3번은 포함되지 않아요!</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag tag-g">포인트 3</span> + 는 붙이기, * 는 반복 — 빼기/나누기는 안 됨</div>
+      <div class="codeblock">a = [1, 2, 3]
 b = [4, 5, 6]
-
 print(a + b)   # → [1, 2, 3, 4, 5, 6]  (이어붙이기)
 print(a * 3)   # → [1, 2, 3, 1, 2, 3, 1, 2, 3]  (반복)
-
-# a - b  →  오류! 리스트끼리 뺄셈 불가
-# a / b  →  오류! 리스트끼리 나눗셈 불가</div>
-    <div class="analogy">비유: 레고 블록 두 더미를 합치거나(+) 복사할 수(*) 있지만, 빼거나 나눌 수는 없어요!</div>
-  </div>
-</div>
-
-<div class="tsec" id="t2">
-  <div class="sec-title">NumPy — * 성분곱 vs @ 행렬곱, 헷갈리면 안 돼요!</div>
-
-  <div class="card">
-    <div class="card-head"><span class="tag tag-w">가장 자주 틀리는 것</span> * vs @</div>
-    <div class="card-sub">아래 두 행렬 A, B가 있을 때 *와 @의 차이를 확인하세요.</div>
-
-    <div class="matrix-wrap">
-      <div>
-        <div class="matrix-label">A</div>
-        <div class="matrix" style="grid-template-columns:repeat(2,36px)">
-          <div class="m-cell">1</div><div class="m-cell">2</div>
-          <div class="m-cell">3</div><div class="m-cell">4</div>
-        </div>
-      </div>
-      <div class="op-label">*</div>
-      <div>
-        <div class="matrix-label">B</div>
-        <div class="matrix" style="grid-template-columns:repeat(2,36px)">
-          <div class="m-cell">5</div><div class="m-cell">6</div>
-          <div class="m-cell">7</div><div class="m-cell">8</div>
-        </div>
-      </div>
-      <div class="op-label">=</div>
-      <div>
-        <div class="matrix-label">A * B (성분별 곱)</div>
-        <div class="matrix" style="grid-template-columns:repeat(2,36px)">
-          <div class="m-cell hl">5</div><div class="m-cell hl">12</div>
-          <div class="m-cell hl">21</div><div class="m-cell hl">32</div>
-        </div>
-      </div>
+# a - b  →  오류!  리스트끼리 뺄셈 불가
+# a / b  →  오류!  리스트끼리 나눗셈 불가</div>
+      <div class="analogy-box">비유: 레고 블록 두 더미를 합치거나(+) 복사할 수(*) 있지만, 빼거나 나눌 수는 없어요!</div>
     </div>
-    <div class="ok">* 는 같은 위치끼리 그냥 곱해요: 1×5=5, 2×6=12, 3×7=21, 4×8=32</div>
-
-    <div class="matrix-wrap" style="margin-top:16px">
-      <div>
-        <div class="matrix-label">A</div>
-        <div class="matrix" style="grid-template-columns:repeat(2,36px)">
-          <div class="m-cell">1</div><div class="m-cell">2</div>
-          <div class="m-cell">3</div><div class="m-cell">4</div>
-        </div>
-      </div>
-      <div class="op-label">@</div>
-      <div>
-        <div class="matrix-label">B</div>
-        <div class="matrix" style="grid-template-columns:repeat(2,36px)">
-          <div class="m-cell">5</div><div class="m-cell">6</div>
-          <div class="m-cell">7</div><div class="m-cell">8</div>
-        </div>
-      </div>
-      <div class="op-label">=</div>
-      <div>
-        <div class="matrix-label">A @ B (행렬 곱)</div>
-        <div class="matrix" style="grid-template-columns:repeat(2,36px)">
-          <div class="m-cell hl">19</div><div class="m-cell hl">22</div>
-          <div class="m-cell hl">43</div><div class="m-cell hl">50</div>
-        </div>
-      </div>
-    </div>
-    <div class="analogy">@ 는 수학 시간에 배운 행렬 곱셈: 1행×1열 = (1×5)+(2×7) = 19</div>
-
-    <div class="warn" style="margin-top:12px">시험에서 "행렬 곱"이 나오면 반드시 @ 또는 np.matmul() 사용!</div>
   </div>
 
-  <div class="card">
-    <div class="card-head"><span class="tag tag-p">핵심 함수</span> shape / T / arange</div>
-    <div class="codeblock">import numpy as np
-
-a = np.array([[1,2,3],[4,5,6]])
+  <!-- NumPy -->
+  <div class="tsec" id="t2">
+    <div class="sec-title">NumPy — * 성분곱 vs @ 행렬곱</div>
+    <div class="card">
+      <div class="card-head"><span class="tag tag-w">가장 자주 틀리는 것</span> * vs @</div>
+      <div class="matrix-wrap">
+        <div><div class="matrix-label">A</div><div class="matrix" style="grid-template-columns:repeat(2,36px)"><div class="m-cell">1</div><div class="m-cell">2</div><div class="m-cell">3</div><div class="m-cell">4</div></div></div>
+        <div class="op-label">*</div>
+        <div><div class="matrix-label">B</div><div class="matrix" style="grid-template-columns:repeat(2,36px)"><div class="m-cell">5</div><div class="m-cell">6</div><div class="m-cell">7</div><div class="m-cell">8</div></div></div>
+        <div class="op-label">=</div>
+        <div><div class="matrix-label">A * B (성분별 곱)</div><div class="matrix" style="grid-template-columns:repeat(2,36px)"><div class="m-cell hl">5</div><div class="m-cell hl">12</div><div class="m-cell hl">21</div><div class="m-cell hl">32</div></div></div>
+      </div>
+      <div class="ok-box">* 는 같은 위치끼리 그냥 곱해요: 1×5=5, 2×6=12, 3×7=21, 4×8=32</div>
+      <div class="matrix-wrap" style="margin-top:16px">
+        <div><div class="matrix-label">A</div><div class="matrix" style="grid-template-columns:repeat(2,36px)"><div class="m-cell">1</div><div class="m-cell">2</div><div class="m-cell">3</div><div class="m-cell">4</div></div></div>
+        <div class="op-label">@</div>
+        <div><div class="matrix-label">B</div><div class="matrix" style="grid-template-columns:repeat(2,36px)"><div class="m-cell">5</div><div class="m-cell">6</div><div class="m-cell">7</div><div class="m-cell">8</div></div></div>
+        <div class="op-label">=</div>
+        <div><div class="matrix-label">A @ B (행렬 곱)</div><div class="matrix" style="grid-template-columns:repeat(2,36px)"><div class="m-cell hl">19</div><div class="m-cell hl">22</div><div class="m-cell hl">43</div><div class="m-cell hl">50</div></div></div>
+      </div>
+      <div class="analogy-box">@ 는 수학 시간에 배운 행렬 곱셈: 1행×1열 = (1×5)+(2×7) = 19</div>
+      <div class="warn-box">시험에서 "행렬 곱"이 나오면 반드시 @ 또는 np.matmul() 사용!</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag tag-p">핵심 함수</span> shape / T / arange</div>
+      <div class="codeblock">a = np.array([[1,2,3],[4,5,6]])
 print(a.shape)    # → (2, 3)  : 2행 3열
 print(a.T.shape)  # → (3, 2)  : 전치 → 3행 2열
-
-# arange: range처럼 배열 생성
 np.arange(1, 10, 2)  # → [1, 3, 5, 7, 9]
-#         시작  끝  간격
-
-# zeros / ones / eye
-np.zeros((3,3))   # 0으로 채운 3×3
-np.eye(3)         # 단위행렬 3×3 (대각선만 1)</div>
-    <div class="analogy">shape = "이 배열은 몇 행 몇 열이야?" 물어보는 것. (2,3) → 2행 3열</div>
-  </div>
-</div>
-
-<div class="tsec" id="t3">
-  <div class="sec-title">OpenCV — BGR 순서 주의!</div>
-
-  <div class="card">
-    <div class="card-head"><span class="tag tag-w">가장 흔한 실수</span> RGB vs BGR</div>
-    <div class="card-sub">OpenCV는 이미지를 읽을 때 B(파랑), G(초록), R(빨강) 순서로 읽어요. 일반적인 RGB와 반대!</div>
-
-    <div class="ocv-row">
-      <div class="ocv-card">
-        <h4>일반적인 RGB</h4>
-        <div style="display:flex;gap:4px;margin:8px 0">
-          <div style="flex:1;height:30px;background:#E24B4A;border-radius:4px"></div>
-          <div style="flex:1;height:30px;background:#639922;border-radius:4px"></div>
-          <div style="flex:1;height:30px;background:#185FA5;border-radius:4px"></div>
-        </div>
-        <p>R → G → B 순서</p>
-      </div>
-      <div class="ocv-card" style="border:0.5px solid #AFA9EC">
-        <h4 style="color:#3C3489">OpenCV BGR</h4>
-        <div style="display:flex;gap:4px;margin:8px 0">
-          <div style="flex:1;height:30px;background:#185FA5;border-radius:4px"></div>
-          <div style="flex:1;height:30px;background:#639922;border-radius:4px"></div>
-          <div style="flex:1;height:30px;background:#E24B4A;border-radius:4px"></div>
-        </div>
-        <p style="color:#3C3489">B → G → R 순서 (반대!)</p>
-      </div>
+np.zeros((3,3))      # 0으로 채운 3×3
+np.eye(3)            # 단위행렬 3×3 (대각선만 1)</div>
+      <div class="analogy-box">shape = "이 배열은 몇 행 몇 열이야?" 물어보는 것. (2,3) → 2행 3열</div>
     </div>
+  </div>
 
-    <div class="warn">Matplotlib으로 보여줄 땐 반드시 BGR→RGB 변환 필요!</div>
-    <div class="codeblock">import cv2, matplotlib.pyplot as plt
-
-img = cv2.imread('image.jpg')          # BGR로 읽힘
-
-# 방법 1: cvtColor로 변환
+  <!-- OpenCV BGR -->
+  <div class="tsec" id="t3">
+    <div class="sec-title">OpenCV — BGR 순서 주의!</div>
+    <div class="card">
+      <div class="card-head"><span class="tag tag-w">가장 흔한 실수</span> RGB vs BGR</div>
+      <div class="card-sub">OpenCV는 이미지를 읽을 때 B(파랑), G(초록), R(빨강) 순서로 읽어요. 일반적인 RGB와 반대!</div>
+      <div class="ocv-row">
+        <div class="ocv-card">
+          <h4>일반적인 RGB</h4>
+          <div style="display:flex;gap:5px;margin:8px 0">
+            <div style="flex:1;height:28px;background:#E24B4A;border-radius:4px"></div>
+            <div style="flex:1;height:28px;background:#639922;border-radius:4px"></div>
+            <div style="flex:1;height:28px;background:#185FA5;border-radius:4px"></div>
+          </div>
+          <p>R → G → B 순서</p>
+        </div>
+        <div class="ocv-card" style="border-color:#AFA9EC">
+          <h4 style="color:#3C3489">OpenCV BGR</h4>
+          <div style="display:flex;gap:5px;margin:8px 0">
+            <div style="flex:1;height:28px;background:#185FA5;border-radius:4px"></div>
+            <div style="flex:1;height:28px;background:#639922;border-radius:4px"></div>
+            <div style="flex:1;height:28px;background:#E24B4A;border-radius:4px"></div>
+          </div>
+          <p style="color:#3C3489">B → G → R 순서 (반대!)</p>
+        </div>
+      </div>
+      <div class="warn-box">Matplotlib으로 보여줄 땐 반드시 BGR→RGB 변환 필요!</div>
+      <div class="codeblock">img = cv2.imread('image.jpg')          # BGR로 읽힘
 rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 plt.imshow(rgb)      # 정상 색상
-
-# 방법 2: 슬라이싱으로 변환
-rgb = img[:, :, ::-1]
-plt.imshow(rgb)</div>
-    <div class="analogy">비유: OpenCV는 "파빨초" 순서로 읽는 특이한 카메라. 보여줄 때는 "빨초파"로 다시 뒤집어야 해요!</div>
-  </div>
-
-  <div class="card">
-    <div class="card-head"><span class="tag tag-g">자주 쓰는 함수</span> 전체 정리</div>
-    <div class="codeblock">img = cv2.imread('img.jpg')              # 컬러 읽기
+# 또는
+rgb = img[:, :, ::-1]</div>
+      <div class="analogy-box">비유: OpenCV는 "파초빨" 순서로 읽는 특이한 카메라. 보여줄 때는 "빨초파"로 다시 뒤집어야 해요!</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag tag-g">자주 쓰는 함수</span> 전체 정리</div>
+      <div class="codeblock">img = cv2.imread('img.jpg')                        # 컬러 읽기
 img = cv2.imread('img.jpg', cv2.IMREAD_GRAYSCALE)  # 흑백
-
 print(img.shape)   # 컬러: (H, W, 3)  /  흑백: (H, W)
-print(img.dtype)   # → uint8  (픽셀값 0~255)
-
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)   # 컬러→흑백
-rgb  = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)    # BGR→RGB
-
-cv2.imshow('창이름', img)   # 화면에 표시
-cv2.waitKey(0)              # 아무 키나 누를 때까지 대기
-cv2.destroyAllWindows()     # 창 닫기
-
-cv2.imwrite('결과.jpg', img)  # 파일로 저장</div>
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+cv2.imshow('창이름', img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+cv2.imwrite('결과.jpg', img)</div>
+    </div>
   </div>
-</div>
 
-<div class="tsec" id="t4">
-  <div class="sec-title">반복문 — for / while 헷갈리지 말자!</div>
-
-  <div class="card">
-    <div class="card-head"><span class="tag tag-p">for 문</span> "이만큼 반복해!"</div>
-    <div class="analogy">비유: "1~9까지 번호표 뽑아서 한 명씩 차례대로 처리해!" 같은 것</div>
-    <div class="codeblock">for n in range(1, 10):
+  <!-- for/while -->
+  <div class="tsec" id="t4">
+    <div class="sec-title">반복문 — for / while 헷갈리지 말자!</div>
+    <div class="card">
+      <div class="card-head"><span class="tag tag-p">for 문</span> "이만큼 반복해!"</div>
+      <div class="analogy-box">비유: "1~9까지 번호표 뽑아서 한 명씩 차례대로 처리해!" 같은 것</div>
+      <div class="codeblock">for n in range(1, 10):
     print(n)          # 1, 2, 3, ... 9 출력
 
-# range(시작, 끝, 간격)
 for n in range(0, 10, 2):
     print(n)          # 0, 2, 4, 6, 8 출력
 
-# 리스트 순회
 fruits = ['사과', '바나나', '딸기']
 for f in fruits:
-    print(f)          # 사과, 바나나, 딸기 차례로 출력</div>
-    <div class="warn">range(1, 10) 은 1~9까지! 10은 포함 안 됨 (슬라이싱과 동일한 규칙)</div>
-  </div>
-
-  <div class="card">
-    <div class="card-head"><span class="tag tag-amber" style="background:#FAEEDA;color:#633806">while 문</span> "조건이 참인 동안 반복해!"</div>
-    <div class="analogy">비유: "신호등이 빨간불인 동안 계속 기다려!" 같은 것</div>
-    <div class="codeblock">a = 1
+    print(f)</div>
+      <div class="warn-box">range(1, 10) 은 1~9까지! 10은 포함 안 됨 (슬라이싱과 동일한 규칙)</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag tag-w">while 문</span> "조건이 참인 동안 반복해!"</div>
+      <div class="analogy-box">비유: "신호등이 빨간불인 동안 계속 기다려!" 같은 것</div>
+      <div class="codeblock">a = 1
 while a < 10:
     print(a)
-    a += 1         # a = a + 1 (이걸 빠뜨리면 무한루프!)
-
-# for문과 같은 결과: 1, 2, 3, ... 9 출력</div>
-    <div class="warn">while 문 안에서 조건을 바꾸는 코드를 빠뜨리면 무한 루프에 빠집니다!</div>
-  </div>
-
-  <div class="card">
-    <div class="card-head"><span class="tag tag-g">함수(def)</span> "재사용 가능한 코드 묶음"</div>
-    <div class="codeblock">def greet(name):        # 함수 정의
+    a += 1         # 이걸 빠뜨리면 무한루프!</div>
+      <div class="warn-box">while 문 안에서 조건을 바꾸는 코드를 빠뜨리면 무한 루프에 빠집니다!</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="tag tag-g">함수(def)</span> "재사용 가능한 코드 묶음"</div>
+      <div class="codeblock">def greet(name):
     msg = "안녕, " + name
-    return msg          # 결과 반환
+    return msg
 
-result = greet("민수")  # 함수 호출
+result = greet("민수")
 print(result)           # → 안녕, 민수
 
-# 기본값(default) 설정
 def power(x, n=2):      # n의 기본값은 2
     return x ** n
 
-print(power(3))         # → 9  (n=2로 자동)
-print(power(3, 3))      # → 27 (n=3으로 지정)</div>
-    <div class="analogy">비유: 함수 = 레시피. 재료(인자)를 넣으면 음식(결과)이 나오는 것. 한 번 만들어두면 계속 재사용 가능!</div>
-    <div class="warn">함수 안에서 만든 변수는 함수 밖에서 사용 불가 (함수가 끝나면 사라짐)</div>
+print(power(3))         # → 9
+print(power(3, 3))      # → 27</div>
+      <div class="analogy-box">비유: 함수 = 레시피. 재료(인자)를 넣으면 음식(결과)이 나오는 것!</div>
+      <div class="warn-box">함수 안에서 만든 변수는 함수 밖에서 사용 불가 (함수가 끝나면 사라짐)</div>
+    </div>
   </div>
-</div>
 
 </div>
-
-<script>
-function sw(btn,id){
-  document.querySelectorAll('.tab2').forEach(t=>t.classList.remove('on'));
-  document.querySelectorAll('.tsec').forEach(t=>t.classList.remove('on'));
-  btn.classList.add('on');
-  document.getElementById(id).classList.add('on');
-}
-
-const vals=[10,20,30,40,50];
-function hl(i){
-  document.querySelectorAll('#list-display .list-cell').forEach((c,j)=>{
-    c.classList.toggle('highlight', j===i);
-  });
-  document.getElementById('hl-result').textContent = `a[${i}] = ${vals[i]}`;
-}
-
-function sliceUpdate(){
-  const s=parseInt(document.getElementById('sl-s').value);
-  const e=parseInt(document.getElementById('sl-e').value);
-  document.getElementById('sl-sv').textContent=s;
-  document.getElementById('sl-ev').textContent=e;
-  for(let i=0;i<5;i++){
-    const c=document.getElementById('sc'+i);
-    c.classList.toggle('highlight', i>=s && i<e);
-  }
-  const picked=vals.slice(s,e);
-  document.getElementById('slice-result').textContent=`a[${s}:${e}] = [${picked.join(', ')}]`;
-}
-sliceUpdate();
-</script>
+<script src="explainer-week2.js"></script>
+</body>
+</html>

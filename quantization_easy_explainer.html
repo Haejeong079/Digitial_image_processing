@@ -1,190 +1,117 @@
-
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font-sans)}
-.wrap{padding:1rem 0}
-.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:12px}
-.card-title{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:8px}
-.label{font-size:13px;color:var(--color-text-secondary);line-height:1.7}
-.analogy-box{background:#EEEDFE;border-left:3px solid #534AB7;padding:10px 14px;margin:10px 0;font-size:13px;color:#3C3489;line-height:1.7;border-radius:0}
-.warn-box{background:#FAEEDA;border-left:3px solid #854F0B;padding:10px 14px;margin:10px 0;font-size:13px;color:#633806;line-height:1.7;border-radius:0}
-.ok-box{background:#EAF3DE;border-left:3px solid #3B6D11;padding:10px 14px;margin:10px 0;font-size:13px;color:#27500A;line-height:1.7;border-radius:0}
-.slider-row{display:flex;align-items:center;gap:12px;margin:12px 0}
-.slider-row label{font-size:13px;color:var(--color-text-secondary);min-width:60px}
-.slider-row input{flex:1}
-.slider-val{font-size:14px;font-weight:500;color:#534AB7;min-width:80px;text-align:right}
-canvas{border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);display:block;width:100%;margin:8px 0}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
-@media(max-width:500px){.two-col{grid-template-columns:1fr}}
-.col-label{font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px;text-align:center}
-.step-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
-.step-n{min-width:24px;height:24px;background:#534AB7;color:#EEEDFE;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0}
-.step-t{font-size:13px;color:var(--color-text-secondary);line-height:1.6;padding-top:3px}
-code{font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:2px 5px;border-radius:4px;color:var(--color-text-primary)}
-.codeblock{font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:10px 14px;border-radius:var(--border-radius-md);color:var(--color-text-primary);line-height:1.8;white-space:pre;overflow-x:auto;margin:8px 0}
-.pixel-grid{display:grid;gap:3px;margin:8px auto}
-.px{border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;transition:background .3s}
-.formula{background:#EEEDFE;padding:10px 14px;border-radius:var(--border-radius-md);font-family:var(--font-mono);font-size:13px;color:#3C3489;margin:8px 0;text-align:center}
-</style>
-
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>양자화 쉽게 이해하기</title>
+  <link rel="stylesheet" href="explainer.css" />
+</head>
+<body>
 <div class="wrap">
 
-<div class="card">
-  <div class="card-title">크레용 비유로 이해하기</div>
-  <div class="analogy-box">
-    원래 이미지는 <b>256가지 색(0~255)</b>을 쓸 수 있는 고급 물감 세트예요.<br>
-    양자화는 이걸 <b>더 적은 색의 크레용 세트</b>로 줄이는 거예요.<br>
-    크레용 수가 적을수록 표현이 뭉툭해지고 계단 현상이 생겨요!
+  <a class="back-btn" href="index.html">← 돌아가기</a>
+
+  <div class="page-header">
+    <h1>🎨 양자화 (Quantization) 완전 정복</h1>
+    <p>Week 3 · 색 단계를 줄이면 어떻게 될까?</p>
   </div>
-  <div class="label">아래 슬라이더로 직접 확인해보세요 — 단계가 줄어들수록 사진이 거칠어집니다.</div>
-</div>
 
-<div class="card">
-  <div class="card-title">직접 체험 — 밝기 단계를 줄여보세요</div>
-  <div class="slider-row">
-    <label>밝기 단계</label>
-    <input type="range" id="lvl" min="2" max="256" value="256" step="1">
-    <span class="slider-val"><span id="lvl-out">256</span>단계</span>
+  <div class="card">
+    <div class="card-title">🖍️ 크레용 비유로 이해하기</div>
+    <div class="analogy-box">
+      원래 이미지는 <b>256가지 색(0~255)</b>을 쓸 수 있는 고급 물감 세트예요.<br>
+      양자화는 이걸 <b>더 적은 색의 크레용 세트</b>로 줄이는 거예요.<br>
+      크레용 수가 적을수록 표현이 뭉툭해지고 계단 현상이 생겨요!
+    </div>
+    <div class="lbl">아래 슬라이더로 직접 확인해보세요 — 단계가 줄어들수록 사진이 거칠어집니다.</div>
   </div>
-  <div class="two-col">
-    <div>
-      <div class="col-label">원본 (256단계)</div>
-      <canvas id="c-orig" height="160"></canvas>
+
+  <div class="card">
+    <div class="card-title">🎛️ 직접 체험 — 밝기 단계를 줄여보세요</div>
+    <div class="slider-row">
+      <label>밝기 단계</label>
+      <input type="range" id="lvl" min="2" max="256" value="256" step="1">
+      <span class="slider-val"><span id="lvl-out">256</span>단계</span>
     </div>
-    <div>
-      <div class="col-label">양자화 결과</div>
-      <canvas id="c-quant" height="160"></canvas>
+    <div class="two-col">
+      <div>
+        <div class="col-label">원본 (256단계)</div>
+        <canvas id="c-orig" height="160"></canvas>
+      </div>
+      <div>
+        <div class="col-label">양자화 결과</div>
+        <canvas id="c-quant" height="160"></canvas>
+      </div>
     </div>
+    <div id="quant-desc" class="lbl" style="margin-top:4px;text-align:center;font-size:0.78rem"></div>
   </div>
-  <div id="quant-desc" class="label" style="margin-top:4px;font-size:12px;text-align:center"></div>
-</div>
 
-<div class="card">
-  <div class="card-title">픽셀로 보는 양자화 — 숫자가 어떻게 바뀌나</div>
-  <div class="label" style="margin-bottom:10px">예시: 4단계(levels=4)로 양자화할 때, 각 픽셀 값이 어떤 그룹에 속하는지 보세요.</div>
-
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:10px 0">
-    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px;text-align:center">
-      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">그룹 0 (0~63)</div>
-      <div style="width:100%;height:28px;background:rgb(0,0,0);border-radius:4px;margin:4px 0"></div>
-      <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary)">→ 픽셀값 <b style="color:#3C3489">0</b></div>
+  <div class="card">
+    <div class="card-title">🔢 픽셀로 보는 양자화 — 숫자가 어떻게 바뀌나</div>
+    <div class="lbl" style="margin-bottom:10px">예시: 4단계(levels=4)로 양자화할 때, 각 픽셀 값이 어떤 그룹에 속하는지 보세요.</div>
+    <div class="group-grid">
+      <div class="group-card">
+        <div class="g-title">그룹 0 (0~63)</div>
+        <div class="g-swatch" style="background:rgb(0,0,0)"></div>
+        <div class="g-val">→ 픽셀값 <b>0</b></div>
+      </div>
+      <div class="group-card">
+        <div class="g-title">그룹 1 (64~127)</div>
+        <div class="g-swatch" style="background:rgb(85,85,85)"></div>
+        <div class="g-val">→ 픽셀값 <b>85</b></div>
+      </div>
+      <div class="group-card">
+        <div class="g-title">그룹 2 (128~191)</div>
+        <div class="g-swatch" style="background:rgb(170,170,170)"></div>
+        <div class="g-val">→ 픽셀값 <b>170</b></div>
+      </div>
+      <div class="group-card">
+        <div class="g-title">그룹 3 (192~255)</div>
+        <div class="g-swatch" style="background:rgb(255,255,255);border:0.5px solid #ddd"></div>
+        <div class="g-val">→ 픽셀값 <b>255</b></div>
+      </div>
     </div>
-    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px;text-align:center">
-      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">그룹 1 (64~127)</div>
-      <div style="width:100%;height:28px;background:rgb(85,85,85);border-radius:4px;margin:4px 0"></div>
-      <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary)">→ 픽셀값 <b style="color:#3C3489">85</b></div>
-    </div>
-    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px;text-align:center">
-      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">그룹 2 (128~191)</div>
-      <div style="width:100%;height:28px;background:rgb(170,170,170);border-radius:4px;margin:4px 0"></div>
-      <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary)">→ 픽셀값 <b style="color:#3C3489">170</b></div>
-    </div>
-    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px;text-align:center">
-      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">그룹 3 (192~255)</div>
-      <div style="width:100%;height:28px;background:rgb(255,255,255);border-radius:4px;margin:4px 0;border:0.5px solid var(--color-border-tertiary)"></div>
-      <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary)">→ 픽셀값 <b style="color:#3C3489">255</b></div>
-    </div>
+    <div class="ok-box">256가지 다른 값을 딱 4가지로 모아버리는 게 양자화예요! 비슷한 밝기는 같은 값으로 통일됩니다.</div>
   </div>
-  <div class="ok-box">256가지 다른 값을 딱 4가지로 모아버리는 게 양자화예요! 비슷한 밝기는 같은 값으로 통일됩니다.</div>
-</div>
 
-<div class="card">
-  <div class="card-title">코드로 보는 3단계 계산</div>
-  <div class="step-row"><div class="step-n">1</div><div class="step-t">그룹 크기 계산: <code>group_size = 256 // levels</code><br>4단계이면 256 ÷ 4 = <b>64</b> (64개씩 한 그룹)</div></div>
-  <div class="step-row"><div class="step-n">2</div><div class="step-t">픽셀을 그룹에 배정 후 0~255로 다시 늘리기:<br><code>(img // group_size) * (255 // (levels-1))</code></div></div>
-  <div class="step-row"><div class="step-n">3</div><div class="step-t">데이터 타입 변환: <code>.astype(np.uint8)</code><br>(이미지 픽셀은 반드시 정수 0~255이어야 함)</div></div>
-
-  <div class="codeblock">levels = 4
+  <div class="card">
+    <div class="card-title">💻 코드로 보는 3단계 계산</div>
+    <div class="analogy-box">
+      <b>Step 1</b> 그룹 크기: <code>group_size = 256 // levels</code> — 4단계면 64<br>
+      <b>Step 2</b> 그룹 배정 후 다시 0~255로: <code>(img // group_size) * (255 // (levels-1))</code><br>
+      <b>Step 3</b> 타입 변환: <code>.astype(np.uint8)</code>
+    </div>
+    <div class="codeblock">levels = 4
 group_size = 256 // levels          # = 64
 
 quantized = (img // group_size) * (255 // (levels - 1))
 quantized = quantized.astype(np.uint8)</div>
-
-  <div class="warn-box">단계가 줄수록 → 파일 용량은 줄지만, 이미지 품질(디테일)도 함께 줄어요. 계단 현상(banding)이 심해집니다!</div>
-</div>
-
-<div class="card">
-  <div class="card-title">단계별 픽셀 값 변환 계산기</div>
-  <div class="label" style="margin-bottom:10px">임의의 픽셀 값이 각 단계에서 어떤 값으로 바뀌는지 직접 확인해보세요.</div>
-  <div class="slider-row">
-    <label>픽셀 값</label>
-    <input type="range" id="px-val" min="0" max="255" value="100" step="1">
-    <span class="slider-val"><span id="px-val-out">100</span></span>
+    <div class="warn-box">단계가 줄수록 파일 용량은 줄지만, 이미지 품질(디테일)도 함께 줄어요. 계단 현상(banding)이 심해집니다!</div>
   </div>
-  <div class="slider-row">
-    <label>단계 수</label>
-    <input type="range" id="px-lvl" min="2" max="32" value="4" step="1">
-    <span class="slider-val"><span id="px-lvl-out">4</span>단계</span>
+
+  <div class="card">
+    <div class="card-title">🧮 픽셀 값 변환 계산기</div>
+    <div class="lbl" style="margin-bottom:10px">임의의 픽셀 값이 각 단계에서 어떤 값으로 바뀌는지 직접 확인해보세요.</div>
+    <div class="slider-row">
+      <label>픽셀 값</label>
+      <input type="range" id="px-val" min="0" max="255" value="100" step="1">
+      <span class="slider-val"><span id="px-val-out">100</span></span>
+    </div>
+    <div class="slider-row">
+      <label>단계 수</label>
+      <input type="range" id="px-lvl" min="2" max="32" value="4" step="1">
+      <span class="slider-val"><span id="px-lvl-out">4</span>단계</span>
+    </div>
+    <div id="calc-result" style="background:#f7f6f2;border-radius:8px;border:0.5px solid #e0ddd5;padding:12px 14px;margin-top:8px;font-size:0.83rem;line-height:2;color:#444"></div>
+    <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
+      <div id="orig-px" style="width:52px;height:52px;border-radius:8px;border:0.5px solid #e0ddd5;flex-shrink:0"></div>
+      <div style="font-size:1.4rem;color:#aaa">→</div>
+      <div id="quant-px" style="width:52px;height:52px;border-radius:8px;border:0.5px solid #e0ddd5;flex-shrink:0"></div>
+      <div class="lbl" style="margin-left:4px">원본 → 양자화 후</div>
+    </div>
   </div>
-  <div id="calc-result" style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px;margin-top:8px;font-size:13px;line-height:2;color:var(--color-text-secondary)"></div>
-  <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
-    <div id="orig-px" style="width:48px;height:48px;border-radius:6px;border:0.5px solid var(--color-border-tertiary)"></div>
-    <div style="font-size:20px;color:var(--color-text-tertiary)">→</div>
-    <div id="quant-px" style="width:48px;height:48px;border-radius:6px;border:0.5px solid var(--color-border-tertiary)"></div>
-    <div style="font-size:13px;color:var(--color-text-secondary);margin-left:4px">원본 → 양자화 후</div>
-  </div>
-</div>
 
 </div>
-
-<script>
-function drawCanvases(levels){
-  const co=document.getElementById('c-orig');
-  const cq=document.getElementById('c-quant');
-  const w=co.offsetWidth||300;
-  co.width=w; co.height=160;
-  cq.width=w; cq.height=160;
-  const go=co.getContext('2d');
-  const gq=cq.getContext('2d');
-
-  for(let x=0;x<w;x++){
-    const val=Math.round((x/(w-1))*255);
-    const gs=Math.floor(256/levels);
-    const group=Math.floor(val/gs);
-    const qval=Math.round(group*(255/Math.max(levels-1,1)));
-
-    go.fillStyle=`rgb(${val},${val},${val})`;
-    go.fillRect(x,0,1,160);
-
-    gq.fillStyle=`rgb(${qval},${qval},${qval})`;
-    gq.fillRect(x,0,1,160);
-  }
-
-  const desc=document.getElementById('quant-desc');
-  if(levels>=128) desc.textContent='거의 차이가 없어요! 단계가 많을수록 원본에 가깝습니다.';
-  else if(levels>=32) desc.textContent='살짝 경계가 보이기 시작해요.';
-  else if(levels>=8) desc.textContent='계단 현상(banding)이 뚜렷하게 보여요!';
-  else desc.textContent='단계가 너무 적어서 원본과 많이 달라졌어요!';
-}
-
-function calcPixel(){
-  const v=parseInt(document.getElementById('px-val').value);
-  const l=parseInt(document.getElementById('px-lvl').value);
-  document.getElementById('px-val-out').textContent=v;
-  document.getElementById('px-lvl-out').textContent=l;
-
-  const gs=Math.floor(256/l);
-  const group=Math.floor(v/gs);
-  const step=Math.round(255/Math.max(l-1,1));
-  const qv=Math.min(group*step,255);
-
-  document.getElementById('calc-result').innerHTML=
-    `그룹 크기: 256 ÷ ${l} = <b style="color:#534AB7">${gs}</b><br>`+
-    `픽셀 ${v} → 그룹 번호: ${v} ÷ ${gs} = <b style="color:#534AB7">${group}</b>번 그룹<br>`+
-    `변환 후 픽셀 값: ${group} × ${step} = <b style="color:#534AB7">${qv}</b>`;
-
-  document.getElementById('orig-px').style.background=`rgb(${v},${v},${v})`;
-  document.getElementById('quant-px').style.background=`rgb(${qv},${qv},${qv})`;
-}
-
-document.getElementById('lvl').addEventListener('input',function(){
-  const l=parseInt(this.value);
-  document.getElementById('lvl-out').textContent=l;
-  drawCanvases(l);
-});
-
-document.getElementById('px-val').addEventListener('input',calcPixel);
-document.getElementById('px-lvl').addEventListener('input',calcPixel);
-
-setTimeout(()=>{drawCanvases(256); calcPixel();},100);
-</script>
+<script src="explainer-quantization.js"></script>
+</body>
+</html>

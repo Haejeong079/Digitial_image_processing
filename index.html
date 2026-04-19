@@ -5,18 +5,99 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>디지털영상처리 시험 대비 완전 정복</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .btn-code-toggle {
+      display: block; width: 100%; margin: 16px 0 0;
+      padding: 12px 18px;
+      background: linear-gradient(135deg, #534AB7, #3C3489);
+      color: #fff; border: none; border-radius: 10px;
+      font-size: 0.88rem; font-weight: 600; cursor: pointer;
+      text-align: left; transition: opacity .2s;
+    }
+    .btn-code-toggle:hover { opacity: .85; }
+    .code-panel {
+      display: none; margin-top: 6px;
+      border: 1.5px solid #534AB7; border-radius: 12px;
+      overflow: hidden; background: #fff;
+    }
+    .code-panel.open { display: block; }
+    .code-panel-tabs { display: flex; background: #f3f2fd; border-bottom: 1px solid #d4d0f5; }
+    .cp-tab {
+      padding: 9px 18px; border: none; background: transparent;
+      font-size: 0.82rem; font-weight: 500; cursor: pointer;
+      color: #534AB7; border-bottom: 2px solid transparent; transition: all .15s;
+    }
+    .cp-tab.active { background: #fff; border-bottom: 2px solid #534AB7; color: #3C3489; }
+    .cp-tab:hover:not(.active) { background: #ebe9fb; }
+    .cp-sec { display: none; padding: 14px; }
+    .cp-sec.active { display: block; }
+    .cp-card {
+      background: #fafafa; border: 0.5px solid #e0dff8;
+      border-radius: 8px; padding: 14px; margin-bottom: 12px;
+    }
+    .cp-card:last-child { margin-bottom: 0; }
+    .cp-card-title { font-size: 0.85rem; font-weight: 700; color: #3C3489; margin-bottom: 6px; }
+    .cp-desc { font-size: 0.8rem; color: #555; margin-bottom: 8px; line-height: 1.5; }
+    .cp-code {
+      margin: 0; padding: 12px 14px;
+      background: #1e1e2e; color: #cdd6f4;
+      font-family: 'Fira Code', Consolas, 'Courier New', monospace;
+      font-size: 0.78rem; line-height: 1.8;
+      border-radius: 6px; overflow-x: auto; white-space: pre;
+    }
+    .cp-warn {
+      background: #fff8e6; border-left: 3px solid #f59e0b;
+      padding: 8px 12px; margin-top: 8px;
+      font-size: 0.78rem; color: #92400e; line-height: 1.5;
+    }
+    .cp-ok {
+      background: #ecfdf5; border-left: 3px solid #10b981;
+      padding: 8px 12px; margin-bottom: 8px;
+      font-size: 0.78rem; color: #065f46; line-height: 1.5;
+    }
+    .cp-score-row { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .cp-sc { background: #f3f2fd; border-radius: 8px; padding: 8px 14px; text-align: center; min-width: 70px; }
+    .cp-sc-n { display: block; font-size: 1.2rem; font-weight: 700; color: #534AB7; }
+    .cp-sc-l { display: block; font-size: 0.72rem; color: #888; margin-top: 2px; }
+    .cq-item { border: 0.5px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 10px; background: #fff; transition: border-color .2s; }
+    .cq-item.ok-card { border-color: #10b981; }
+    .cq-item.ng-card { border-color: #ef4444; }
+    .cq-q { font-size: 0.82rem; font-weight: 600; color: #222; margin-bottom: 8px; line-height: 1.5; }
+    .cq-code {
+      font-family: 'Fira Code', Consolas, monospace; font-size: 0.78rem;
+      background: #f5f5f5; padding: 10px 12px; border-radius: 6px;
+      line-height: 1.9; white-space: pre-wrap; margin-bottom: 8px; color: #222;
+    }
+    .cq-inp {
+      display: inline-block; min-width: 110px;
+      border: none; border-bottom: 2px solid #534AB7;
+      background: transparent;
+      font-family: 'Fira Code', Consolas, monospace; font-size: 0.78rem;
+      color: #534AB7; outline: none; padding: 0 3px; vertical-align: bottom; text-align: center;
+    }
+    .cq-inp.ok2 { border-bottom-color: #10b981; color: #065f46; background: #ecfdf5; border-radius: 3px 3px 0 0; }
+    .cq-inp.ng2 { border-bottom-color: #ef4444; color: #7f1d1d; background: #fef2f2; border-radius: 3px 3px 0 0; }
+    .cq-btn-row { display: flex; gap: 6px; margin-top: 8px; }
+    .cq-btn-check { padding: 5px 14px; background: #534AB7; color: #fff; border: none; border-radius: 6px; font-size: 0.78rem; cursor: pointer; }
+    .cq-btn-check:hover { background: #3C3489; }
+    .cq-btn-hint { padding: 5px 12px; background: transparent; border: 0.5px solid #aaa; border-radius: 6px; font-size: 0.78rem; cursor: pointer; color: #555; }
+    .cq-btn-hint:hover { background: #f5f5f5; }
+    .cq-fb { margin-top: 8px; font-size: 0.76rem; padding: 8px 10px; border-radius: 6px; display: none; line-height: 1.55; }
+    .cq-fb.show  { display: block; }
+    .cq-fb.ok3   { background: #ecfdf5; color: #065f46; }
+    .cq-fb.ng3   { background: #fef2f2; color: #7f1d1d; }
+    .cq-fb.hint3 { background: #f3f2fd; color: #3C3489; }
+  </style>
 </head>
 <body>
 
 <div class="page-wrap">
 
-  <!-- ── Header ── -->
   <div class="page-header">
     <h1>📷 디지털영상처리 시험 대비 완전 정복</h1>
     <p>Week 2~6 Lab 강의 자료 기반 &nbsp;·&nbsp; 4월 21일(화) 시험</p>
   </div>
 
-  <!-- ── Progress ── -->
   <div class="progress-wrap">
     <div class="progress-label">
       <span>퀴즈 진행도</span>
@@ -27,39 +108,22 @@
     </div>
   </div>
 
-  <!-- ── Tabs ── -->
   <div class="tabs">
-    <button class="tab active" onclick="showTab('w2', this)">
-      Week 2<span class="tab-sub">Python 기초</span>
-    </button>
-    <button class="tab" onclick="showTab('w3', this)">
-      Week 3<span class="tab-sub">이미지처리</span>
-    </button>
-    <button class="tab" onclick="showTab('w4', this)">
-      Week 4<span class="tab-sub">샘플링</span>
-    </button>
-    <button class="tab" onclick="showTab('w5', this)">
-      Week 5<span class="tab-sub">히스토그램</span>
-    </button>
-    <button class="tab" onclick="showTab('w6', this)">
-      Week 6<span class="tab-sub">주파수 필터링</span>
-    </button>
-    <button class="tab" onclick="showTab('quiz', this)">
-      🧠 퀴즈<span class="tab-sub">실력 점검</span>
-    </button>
+    <button class="tab active" onclick="showTab('w2', this)">Week 2<span class="tab-sub">Python 기초</span></button>
+    <button class="tab" onclick="showTab('w3', this)">Week 3<span class="tab-sub">이미지처리</span></button>
+    <button class="tab" onclick="showTab('w4', this)">Week 4<span class="tab-sub">샘플링</span></button>
+    <button class="tab" onclick="showTab('w5', this)">Week 5<span class="tab-sub">히스토그램</span></button>
+    <button class="tab" onclick="showTab('w6', this)">Week 6<span class="tab-sub">주파수 필터링</span></button>
+    <button class="tab" onclick="showTab('quiz', this)">🧠 퀴즈<span class="tab-sub">실력 점검</span></button>
   </div>
 
-  <!-- ════════════════════════════════
-       WEEK 2
-  ════════════════════════════════ -->
+  <!-- ════ WEEK 2 ════ -->
   <div class="section active" id="tab-w2">
-
     <div class="card">
       <span class="badge badge-purple">Week 2 · Python Introduction + OpenCV 기초</span>
       <div class="card-title">핵심 요약</div>
       <div class="card-body">Python 기본 문법과 NumPy, OpenCV의 기초를 다룹니다.</div>
     </div>
-
     <div class="card">
       <div class="card-title">🔤 변수 &amp; 기본 연산</div>
       <div class="card-body">
@@ -72,7 +136,6 @@ print(10 % 3)  # 나머지 → 1
 print(max(5,3)) # 최댓값 → 5</div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">📦 리스트 핵심</div>
       <div class="card-body">
@@ -86,7 +149,6 @@ a.sort()         # 오름차순 정렬
 a.sort(reverse=True)  # 내림차순</div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">🔢 NumPy 핵심</div>
       <div class="card-body">
@@ -106,7 +168,6 @@ np.arange(1,10,2) # [1,3,5,7,9]</div>
         <div class="important">⚠️ 행렬 곱(@)과 성분별 곱(*)을 구분하자!</div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">📸 OpenCV 기본 함수</div>
       <div class="card-body">
@@ -115,7 +176,7 @@ np.arange(1,10,2) # [1,3,5,7,9]</div>
 img = cv2.imread('image.jpg')           # 컬러 읽기
 img_gray = cv2.imread('image.jpg',
              cv2.IMREAD_GRAYSCALE)      # 흑백 읽기
-print(img.shape)   # (H, W, 3) → BGR 3채널
+print(img.shape)       # (H, W, 3) → BGR 3채널
 print(img_gray.shape)  # (H, W) → 1채널
 
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # 변환
@@ -126,23 +187,16 @@ cv2.imwrite('out.jpg', img) # 저장</div>
         <div class="important">⚠️ OpenCV는 BGR 순서! (RGB가 아님). Matplotlib으로 출력 시 RGB로 변환 필요</div>
       </div>
     </div>
-
-    <a class="btn-ask" href="week2_python_easy_explainer.html" target="_blank">
-      더 자세히 보기 ↗
-    </a>
+    <button class="btn-ask" onclick="window.open('week2_python_easy_explainer.html','_blank')">더 자세히 보기 ↗</button>
   </div>
 
-  <!-- ════════════════════════════════
-       WEEK 3
-  ════════════════════════════════ -->
+  <!-- ════ WEEK 3 ════ -->
   <div class="section" id="tab-w3">
-
     <div class="card">
       <span class="badge badge-teal">Week 3 · Image Processing (서브샘플링 &amp; 양자화)</span>
       <div class="card-title">핵심 요약</div>
       <div class="card-body">이미지 해상도 줄이기(서브샘플링)와 색 단계 줄이기(양자화)를 다룹니다.</div>
     </div>
-
     <div class="card">
       <div class="card-title">📷 서브샘플링 (Subsampling)</div>
       <div class="card-body">
@@ -150,59 +204,42 @@ cv2.imwrite('out.jpg', img) # 저장</div>
         <div class="code-block">img = cv2.imread('dogs.jpg')
 h, w = img.shape[:2]
 
-# 1/2로 줄이기
-half = cv2.resize(img, (w//2, h//2))
-
-# 1/4로 줄이기
+half    = cv2.resize(img, (w//2, h//2))
 quarter = cv2.resize(img, (w//4, h//4))
 
 cv2.imwrite('half.jpg', half)</div>
         <div class="card-body" style="margin-top:8px">과제: dogs.jpg를 2, 4, 8배로 서브샘플링 → 파이썬 1개 + 이미지 3개 제출</div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">🎨 양자화 (Quantization)</div>
       <div class="card-body">
         <div class="important">🎨 256색(0~255)을 4색, 8색처럼 줄이는 것. 계단 현상 발생!</div>
         <div class="code-block">img = cv2.imread('xray.jpg', cv2.IMREAD_GRAYSCALE)
-levels = 4   # 4단계로 줄이기
+levels = 4
 
-# Step 1: 그룹 크기 계산
-group_size = 256 // levels  # = 64
-
-# Step 2: 그룹화 + 0~255로 스케일링
-quantized = (img // group_size) * (255 // (levels-1))
-
-# Step 3: uint8 변환
-quantized = quantized.astype(np.uint8)</div>
+group_size = 256 // levels          # = 64
+quantized  = (img // group_size) * (255 // (levels-1))
+quantized  = quantized.astype(np.uint8)</div>
         <div class="card-body" style="margin-top:8px">과제: xray.jpg를 32, 8, 4, 2단계로 양자화 → 이미지 4개 제출</div>
       </div>
     </div>
-
-    <a class="btn-ask" href="quantization_easy_explainer.html" target="_blank">
-      개념 더 쉽게 보기 ↗
-    </a>
+    <button class="btn-ask" onclick="window.open('quantization_easy_explainer.html','_blank')">개념 더 쉽게 보기 ↗</button>
   </div>
 
-  <!-- ════════════════════════════════
-       WEEK 4
-  ════════════════════════════════ -->
+  <!-- ════ WEEK 4 ════ -->
   <div class="section" id="tab-w4">
-
     <div class="card">
       <span class="badge badge-amber">Week 4 · Sampling &amp; Upsampling (보간법)</span>
       <div class="card-title">핵심 요약</div>
       <div class="card-body">Nyquist 정리, Zone Plate, 보간법(Nearest Neighbor / Bilinear / Bicubic)을 다룹니다.</div>
     </div>
-
     <div class="card">
       <div class="card-title">🌊 저주파 vs 고주파</div>
       <div class="card-body">
         <div class="important">🌊 저주파 = 천천히 변하는 부분 (배경, 하늘) / 고주파 = 빠르게 변하는 부분 (엣지, 경계선)</div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">⭐ Nyquist 정리</div>
       <div class="card-body">
@@ -210,66 +247,216 @@ quantized = quantized.astype(np.uint8)</div>
         <div class="card-body" style="margin-top:8px">Zone Plate 이미지로 확인: stride를 크게 하면 바깥쪽(고주파) 영역이 뭉개짐</div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">⭐ 보간법 (Interpolation) 핵심</div>
       <div class="card-body">
         <div class="important">📸 작은 이미지를 크게 키울 때 없는 픽셀을 채우는 방법!</div>
         <div class="two-col">
-          <div class="two-col-item">
-            <div class="col-title">Nearest Neighbor</div>
-            <div class="col-desc">가장 가까운 픽셀 값 그대로 복사. 빠르지만 계단 현상</div>
-          </div>
-          <div class="two-col-item">
-            <div class="col-title">Bilinear</div>
-            <div class="col-desc">주변 4개 점을 선형 보간. 더 부드러운 결과</div>
-          </div>
-          <div class="two-col-item">
-            <div class="col-title">Bicubic</div>
-            <div class="col-desc">주변 16개 점으로 3차 함수 보간. 가장 부드러움</div>
-          </div>
-          <div class="two-col-item">
-            <div class="col-title">OpenCV 코드</div>
-            <div class="col-mono">cv2.resize(img, (w,h),<br>interpolation=cv2.INTER_LINEAR)</div>
-          </div>
+          <div class="two-col-item"><div class="col-title">Nearest Neighbor</div><div class="col-desc">가장 가까운 픽셀 값 그대로 복사. 빠르지만 계단 현상</div></div>
+          <div class="two-col-item"><div class="col-title">Bilinear</div><div class="col-desc">주변 4개 점을 선형 보간. 더 부드러운 결과</div></div>
+          <div class="two-col-item"><div class="col-title">Bicubic</div><div class="col-desc">주변 16개 점으로 3차 함수 보간. 가장 부드러움</div></div>
+          <div class="two-col-item"><div class="col-title">OpenCV 코드</div><div class="col-mono">cv2.resize(img, (w,h),<br>interpolation=cv2.INTER_LINEAR)</div></div>
         </div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">📋 Week 4 과제 요약</div>
       <div class="card-body">
-        <div class="step">
-          <div class="step-num">1</div>
-          <div class="step-text">Zone Plate 이미지를 stride 2, 4, 8로 서브샘플링 후 복원 → 이미지 3개</div>
-        </div>
-        <div class="step">
-          <div class="step-num">2</div>
-          <div class="step-text">stride=4 고정, GaussianBlur 적용 후 서브샘플링. 커널/sigma 조절해 최적값 찾기 + 트레이드오프 분석 주석 작성</div>
-        </div>
-        <div class="step">
-          <div class="step-num">3</div>
-          <div class="step-text">pandas.jpg에 수동 Bilinear 보간 vs cv2.resize(INTER_LINEAR) 비교 + 차이 이미지 저장</div>
-        </div>
+        <div class="step"><div class="step-num">1</div><div class="step-text">Zone Plate 이미지를 stride 2, 4, 8로 서브샘플링 후 복원 → 이미지 3개</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">stride=4 고정, GaussianBlur 적용 후 서브샘플링. 커널/sigma 조절해 최적값 찾기 + 트레이드오프 분석 주석 작성</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text">pandas.jpg에 수동 Bilinear 보간 vs cv2.resize(INTER_LINEAR) 비교 + 차이 이미지 저장</div></div>
       </div>
     </div>
 
-    <a class="btn-ask" href="bilinear_fixed.html" target="_blank">
-      보간법 쉽게 보기 ↗
-    </a>
+    <button class="btn-code-toggle" id="toggle-w4" onclick="toggleCode('code-w4')">💻 실습 &amp; 과제 코드 보기 ▾</button>
+    <div class="code-panel" id="code-w4">
+      <div class="code-panel-tabs">
+        <button class="cp-tab active" onclick="switchCodeTab('w4','lab',this)">실습 코드</button>
+        <button class="cp-tab" onclick="switchCodeTab('w4','hw',this)">과제 코드</button>
+        <button class="cp-tab" onclick="switchCodeTab('w4','quiz',this)">빈칸 퀴즈</button>
+      </div>
+      <div class="cp-sec active" id="w4-lab">
+        <div class="cp-card">
+          <div class="cp-card-title">실습 1 · Zone Plate 생성</div>
+          <div class="cp-desc">중심에서 멀수록 주파수가 높아지는 테스트 이미지.</div>
+          <pre class="cp-code">import numpy as np
+import cv2
+
+H, W = 512, 512
+y, x = np.indices((H, W))
+r2 = (x - W//2)**2 + (y - H//2)**2
+
+zone = np.cos(r2 / 500.0)
+zone = ((zone + 1) / 2 * 255).astype(np.uint8)
+cv2.imwrite('zone_plate.jpg', zone)</pre>
+        </div>
+        <div class="cp-card">
+          <div class="cp-card-title">실습 2 · stride 서브샘플링 + 복원</div>
+          <div class="cp-desc">stride 간격으로 픽셀을 건너뛰어 샘플링. stride가 크면 앨리어싱 발생.</div>
+          <pre class="cp-code">import numpy as np
+import cv2
+
+zone = cv2.imread('zone_plate.jpg', cv2.IMREAD_GRAYSCALE)
+
+for stride in [2, 4, 8]:
+    sampled  = zone[::stride, ::stride]
+    restored = cv2.resize(
+        sampled,
+        (zone.shape[1], zone.shape[0]),
+        interpolation=cv2.INTER_NEAREST
+    )
+    cv2.imwrite(f'zone_stride{stride}.jpg', restored)</pre>
+          <div class="cp-warn">Stride &gt; Nyquist frequency → 앨리어싱 발생! 바깥쪽 고주파 영역이 뭉개짐.</div>
+        </div>
+        <div class="cp-card">
+          <div class="cp-card-title">실습 3 · Gaussian Blur → 서브샘플링 (Anti-aliasing)</div>
+          <div class="cp-desc">샘플링 전 GaussianBlur로 고주파 제거 → 앨리어싱 감소.</div>
+          <pre class="cp-code">import numpy as np
+import cv2
+
+zone    = cv2.imread('zone_plate.jpg', cv2.IMREAD_GRAYSCALE)
+stride  = 4
+
+blurred  = cv2.GaussianBlur(zone, (9, 9), sigmaX=3)
+sampled  = blurred[::stride, ::stride]
+restored = cv2.resize(
+    sampled,
+    (zone.shape[1], zone.shape[0]),
+    interpolation=cv2.INTER_NEAREST
+)
+cv2.imwrite('zone_blur_stride4.jpg', restored)</pre>
+        </div>
+        <div class="cp-card">
+          <div class="cp-card-title">실습 4 · 수동 Bilinear 보간 vs cv2.resize</div>
+          <pre class="cp-code">import numpy as np
+import cv2
+
+img = cv2.imread('pandas.jpg', cv2.IMREAD_GRAYSCALE).astype(float)
+H, W   = img.shape
+newH, newW = H * 2, W * 2
+
+# ── 수동 Bilinear ──────────────────────────────────
+result_manual = np.zeros((newH, newW))
+for ny in range(newH):
+    for nx in range(newW):
+        ox = nx * (W - 1) / (newW - 1)
+        oy = ny * (H - 1) / (newH - 1)
+        x0, y0 = int(ox), int(oy)
+        x1 = min(x0 + 1, W - 1)
+        y1 = min(y0 + 1, H - 1)
+        tx, ty = ox - x0, oy - y0
+        r1 = img[y0, x0] * (1 - tx) + img[y0, x1] * tx
+        r2 = img[y1, x0] * (1 - tx) + img[y1, x1] * tx
+        result_manual[ny, nx] = r1 * (1 - ty) + r2 * ty
+result_manual = result_manual.astype(np.uint8)
+
+# ── OpenCV Bilinear ────────────────────────────────
+result_cv2 = cv2.resize(
+    img.astype(np.uint8), (newW, newH),
+    interpolation=cv2.INTER_LINEAR
+)
+
+diff = cv2.absdiff(result_manual, result_cv2)
+cv2.imwrite('bilinear_manual.jpg', result_manual)
+cv2.imwrite('bilinear_cv2.jpg',    result_cv2)
+cv2.imwrite('bilinear_diff.jpg',   diff)</pre>
+        </div>
+      </div>
+      <div class="cp-sec" id="w4-hw">
+        <div class="cp-card">
+          <div class="cp-card-title">과제 1 · Zone Plate stride 2·4·8 서브샘플링</div>
+          <div class="cp-ok">제출: 이미지 3개 (zone_stride2.jpg / zone_stride4.jpg / zone_stride8.jpg)</div>
+          <pre class="cp-code">import numpy as np
+import cv2
+
+H, W = 512, 512
+y, x = np.indices((H, W))
+r2   = (x - W//2)**2 + (y - H//2)**2
+zone = ((np.cos(r2 / 500.0) + 1) / 2 * 255).astype(np.uint8)
+
+for stride in [2, 4, 8]:
+    sampled  = zone[::stride, ::stride]
+    restored = cv2.resize(sampled, (W, H),
+                          interpolation=cv2.INTER_NEAREST)
+    cv2.imwrite(f'zone_stride{stride}.jpg', restored)</pre>
+        </div>
+        <div class="cp-card">
+          <div class="cp-card-title">과제 2 · Gaussian Blur 최적값 + 트레이드오프 분석 주석</div>
+          <div class="cp-ok">제출: 파이썬 1개 + 이미지 1개 (코드 안에 분석 주석 필수!)</div>
+          <pre class="cp-code">import numpy as np
+import cv2
+
+H, W = 512, 512
+y, x = np.indices((H, W))
+r2   = (x - W//2)**2 + (y - H//2)**2
+zone = ((np.cos(r2 / 500.0) + 1) / 2 * 255).astype(np.uint8)
+
+stride   = 4
+blurred  = cv2.GaussianBlur(zone, (9, 9), sigmaX=3)
+sampled  = blurred[::stride, ::stride]
+restored = cv2.resize(sampled, (W, H),
+                      interpolation=cv2.INTER_NEAREST)
+cv2.imwrite('zone_gauss_best.jpg', restored)
+
+# [트레이드오프 분석 주석 — 반드시 포함]
+# kernel=(5,5)   sigma=1 : 앨리어싱 많이 남음, 디테일 보존 양호
+# kernel=(9,9)   sigma=3 : 앨리어싱 크게 감소, 디테일 약간 손실  ← 최적
+# kernel=(15,15) sigma=5 : 앨리어싱 거의 없음, 디테일 손실 큼
+# 결론: 커널이 클수록 앨리어싱↓ 디테일↓. (9,9)/sigma=3이 균형점.</pre>
+        </div>
+        <div class="cp-card">
+          <div class="cp-card-title">과제 3 · 수동 Bilinear vs cv2.resize 비교</div>
+          <div class="cp-ok">제출: 파이썬 1개 + 이미지 3개 (수동 결과 / OpenCV 결과 / 차이 이미지)</div>
+          <pre class="cp-code">import numpy as np
+import cv2
+
+img = cv2.imread('pandas.jpg', cv2.IMREAD_GRAYSCALE).astype(float)
+H, W   = img.shape
+newH, newW = H * 2, W * 2
+
+manual = np.zeros((newH, newW))
+for ny in range(newH):
+    for nx in range(newW):
+        ox = nx * (W - 1) / (newW - 1)
+        oy = ny * (H - 1) / (newH - 1)
+        x0, y0 = int(ox), int(oy)
+        x1 = min(x0 + 1, W - 1)
+        y1 = min(y0 + 1, H - 1)
+        tx, ty = ox - x0, oy - y0
+        r1 = img[y0, x0] * (1 - tx) + img[y0, x1] * tx
+        r2 = img[y1, x0] * (1 - tx) + img[y1, x1] * tx
+        manual[ny, nx] = r1 * (1 - ty) + r2 * ty
+manual = manual.astype(np.uint8)
+
+ocv  = cv2.resize(img.astype(np.uint8), (newW, newH),
+                  interpolation=cv2.INTER_LINEAR)
+diff = cv2.absdiff(manual, ocv)
+
+cv2.imwrite('bilinear_manual.jpg', manual)
+cv2.imwrite('bilinear_cv2.jpg',    ocv)
+cv2.imwrite('bilinear_diff.jpg',   diff)</pre>
+        </div>
+      </div>
+      <div class="cp-sec" id="w4-quiz">
+        <div class="cp-score-row">
+          <div class="cp-sc"><span class="cp-sc-n" id="cq-w4-c">0</span><span class="cp-sc-l">맞음</span></div>
+          <div class="cp-sc"><span class="cp-sc-n" id="cq-w4-t">0</span><span class="cp-sc-l">채점함</span></div>
+          <div class="cp-sc"><span class="cp-sc-n" id="cq-w4-p">0%</span><span class="cp-sc-l">정답률</span></div>
+        </div>
+        <div id="cq-w4-list"></div>
+      </div>
+    </div>
+
+    <button class="btn-ask" onclick="window.open('bilinear_fixed.html','_blank')">보간법 쉽게 보기 ↗</button>
   </div>
 
-  <!-- ════════════════════════════════
-       WEEK 5
-  ════════════════════════════════ -->
+  <!-- ════ WEEK 5 ════ -->
   <div class="section" id="tab-w5">
-
     <div class="card">
       <span class="badge badge-coral">Week 5 · Histogram &amp; Contrast Enhancement</span>
       <div class="card-title">핵심 요약</div>
       <div class="card-body">히스토그램, 감마 보정, 대비 향상, 히스토그램 평활화를 다룹니다.</div>
     </div>
-
     <div class="card">
       <div class="card-title">📊 히스토그램</div>
       <div class="card-body">
@@ -280,7 +467,6 @@ plt.hist(gray.flatten(), bins=256, range=(0,255))
 plt.show()</div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">💡 감마 보정 (Gamma Correction)</div>
       <div class="card-body">
@@ -290,7 +476,6 @@ corrected = np.power(img/255.0, gamma) * 255
 corrected = corrected.astype(np.uint8)</div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">⭐ 히스토그램 평활화 (Histogram Equalization)</div>
       <div class="card-body">
@@ -307,131 +492,607 @@ lut = np.round(
   (cdf - cdf_min) / (cdf_max - cdf_min) * (L-1)
 ).astype(np.uint8)
 
-result = lut[gray]  # LUT 적용</div>
+result = lut[gray]</div>
         <div class="important">⚠️ 경고: cv2.equalizeHist() 사용하면 미제출 처리!</div>
       </div>
     </div>
 
-    <a class="btn-ask" href="histogram_equalization_explainer.html" target="_blank">
-      평활화 공식 쉽게 보기 ↗
-    </a>
+    <button class="btn-code-toggle" id="toggle-w5" onclick="toggleCode('code-w5')">💻 실습 &amp; 과제 코드 보기 ▾</button>
+    <div class="code-panel" id="code-w5">
+      <div class="code-panel-tabs">
+        <button class="cp-tab active" onclick="switchCodeTab('w5','lab',this)">실습 코드</button>
+        <button class="cp-tab" onclick="switchCodeTab('w5','hw',this)">과제 코드</button>
+        <button class="cp-tab" onclick="switchCodeTab('w5','quiz',this)">빈칸 퀴즈</button>
+      </div>
+      <div class="cp-sec active" id="w5-lab">
+        <div class="cp-card">
+          <div class="cp-card-title">실습 1 · 히스토그램 그리기</div>
+          <pre class="cp-code">import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+gray = cv2.imread('bean.jpg', cv2.IMREAD_GRAYSCALE)
+
+plt.hist(gray.flatten(), bins=256, range=(0, 255))
+plt.xlabel('Pixel value (0~255)')
+plt.ylabel('Count')
+plt.title('Histogram')
+plt.tight_layout()
+plt.show()</pre>
+        </div>
+        <div class="cp-card">
+          <div class="cp-card-title">실습 2 · 감마 보정 (Gamma Correction)</div>
+          <div class="cp-desc">gamma &lt; 1 → 어두운 이미지 밝게 / gamma &gt; 1 → 밝은 이미지 어둡게</div>
+          <pre class="cp-code">import cv2
+import numpy as np
+
+gray  = cv2.imread('bean.jpg', cv2.IMREAD_GRAYSCALE)
+gamma = 0.5
+
+corrected = np.power(gray / 255.0, gamma) * 255
+corrected = corrected.astype(np.uint8)
+
+cv2.imshow('Original',        gray)
+cv2.imshow('Gamma Corrected', corrected)
+cv2.waitKey(0)
+cv2.destroyAllWindows()</pre>
+        </div>
+        <div class="cp-card">
+          <div class="cp-card-title">실습 3 · 수동 대비 향상 (Contrast Stretching)</div>
+          <pre class="cp-code">import cv2
+import numpy as np
+
+gray = cv2.imread('bean.jpg', cv2.IMREAD_GRAYSCALE).astype(float)
+
+vmin, vmax = gray.min(), gray.max()
+stretched  = (gray - vmin) / (vmax - vmin) * 255
+stretched  = stretched.astype(np.uint8)
+
+cv2.imwrite('stretched.jpg', stretched)</pre>
+        </div>
+        <div class="cp-card">
+          <div class="cp-card-title">실습 4 · 히스토그램 평활화 내장 함수 (참고용)</div>
+          <div class="cp-warn">⚠️ 과제에서 이 함수를 사용하면 미제출 처리! 참고만 하세요.</div>
+          <pre class="cp-code">import cv2
+
+gray      = cv2.imread('bean.jpg', cv2.IMREAD_GRAYSCALE)
+equalized = cv2.equalizeHist(gray)   # 과제 사용 금지!
+cv2.imwrite('equalized_builtin.jpg', equalized)</pre>
+        </div>
+      </div>
+      <div class="cp-sec" id="w5-hw">
+        <div class="cp-card">
+          <div class="cp-card-title">과제 · 히스토그램 평활화 직접 구현</div>
+          <div class="cp-ok">제출: 파이썬 1개 + 히스토그램 비교 이미지 + 결과 이미지</div>
+          <div class="cp-desc">공식: h(v) = round( (CDF(v) - CDF_min) / (CDF_max - CDF_min) × (L-1) )</div>
+          <pre class="cp-code">import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+gray = cv2.imread('bean.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Step 1: 히스토그램 계산
+hist, _ = np.histogram(gray.flatten(), bins=256, range=(0, 256))
+
+# Step 2: CDF (누적합)
+cdf = hist.cumsum()
+
+# Step 3: CDF_min — 0인 구간 제외! / CDF_max
+cdf_min = cdf[cdf > 0].min()
+cdf_max = cdf.max()
+L = 256
+
+# Step 4: 공식 적용 → LUT 생성
+lut = np.round(
+    (cdf - cdf_min) / (cdf_max - cdf_min) * (L - 1)
+).astype(np.uint8)
+
+# Step 5: LUT를 이미지에 적용
+result = lut[gray]
+cv2.imwrite('he_result.jpg', result)
+
+# Step 6: 히스토그램 전/후 비교 저장
+fig, axes = plt.subplots(1, 2, figsize=(10, 3))
+axes[0].hist(gray.flatten(),   bins=256, range=(0, 255))
+axes[0].set_title('Before HE')
+axes[1].hist(result.flatten(), bins=256, range=(0, 255))
+axes[1].set_title('After HE')
+plt.tight_layout()
+plt.savefig('he_histograms.jpg')
+plt.show()</pre>
+          <div class="cp-warn">cdf_min = cdf[cdf &gt; 0].min() — 0 제외 안 하면 공식이 틀립니다!</div>
+        </div>
+      </div>
+      <div class="cp-sec" id="w5-quiz">
+        <div class="cp-score-row">
+          <div class="cp-sc"><span class="cp-sc-n" id="cq-w5-c">0</span><span class="cp-sc-l">맞음</span></div>
+          <div class="cp-sc"><span class="cp-sc-n" id="cq-w5-t">0</span><span class="cp-sc-l">채점함</span></div>
+          <div class="cp-sc"><span class="cp-sc-n" id="cq-w5-p">0%</span><span class="cp-sc-l">정답률</span></div>
+        </div>
+        <div id="cq-w5-list"></div>
+      </div>
+    </div>
+
+    <button class="btn-ask" onclick="window.open('histogram_equalization_explainer.html','_blank')">평활화 공식 쉽게 보기 ↗</button>
   </div>
 
-  <!-- ════════════════════════════════
-       WEEK 6
-  ════════════════════════════════ -->
+  <!-- ════ WEEK 6 ════ -->
   <div class="section" id="tab-w6">
-
     <div class="card">
       <span class="badge badge-blue">Week 6 · Frequency Domain Filtering ⭐ 가장 중요!</span>
       <div class="card-title">핵심 요약</div>
       <div class="card-body">DFT, LPF/HPF, Butterworth, Gaussian, Laplacian, Homomorphic 필터링을 다룹니다.</div>
     </div>
-
     <div class="card">
       <div class="card-title">⭐ 주파수 도메인 필터링 전체 절차</div>
       <div class="card-body">
-        <div class="step">
-          <div class="step-num">1</div>
-          <div class="step-text"><strong>Zero-padding</strong>: 이미지 크기를 2M × 2N으로 확장 (경계 효과 방지)</div>
-        </div>
-        <div class="step">
-          <div class="step-num">2</div>
-          <div class="step-text"><strong>Centering</strong>: (-1)^(x+y) 곱해서 저주파를 중심으로 이동</div>
-        </div>
-        <div class="step">
-          <div class="step-num">3</div>
-          <div class="step-text"><strong>DFT</strong>: 공간 도메인 → 주파수 도메인 변환</div>
-        </div>
-        <div class="step">
-          <div class="step-num">4</div>
-          <div class="step-text"><strong>Filtering</strong>: G(u,v) = H(u,v) × F(u,v)</div>
-        </div>
-        <div class="step">
-          <div class="step-num">5</div>
-          <div class="step-text"><strong>Inverse DFT</strong>: 주파수 도메인 → 다시 공간 도메인으로</div>
-        </div>
+        <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Zero-padding</strong>: 이미지 크기를 2M × 2N으로 확장 (경계 효과 방지)</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Centering</strong>: (-1)^(x+y) 곱해서 저주파를 중심으로 이동</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text"><strong>DFT</strong>: 공간 도메인 → 주파수 도메인 변환</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Filtering</strong>: G(u,v) = H(u,v) × F(u,v)</div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-text"><strong>Inverse DFT</strong>: 주파수 도메인 → 다시 공간 도메인으로</div></div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">⭐ 필터 공식 정리 — 암기 필수</div>
       <div class="card-body">
         <div style="font-size:0.82rem;font-weight:700;color:var(--text-primary);margin-bottom:6px">Ideal LPF / HPF</div>
         <div class="formula">LPF: H(u,v) = 1 if D(u,v) ≤ D0, else 0
 HPF: H(u,v) = 1 - H_lpf(u,v)</div>
-
         <div style="font-size:0.82rem;font-weight:700;color:var(--text-primary);margin:12px 0 6px">Butterworth LPF (order n)</div>
         <div class="formula">H(u,v) = 1 / (1 + (D(u,v)/D0)^(2n))
 → 절단 주파수에서 값이 0.5</div>
-
         <div style="font-size:0.82rem;font-weight:700;color:var(--text-primary);margin:12px 0 6px">Gaussian LPF</div>
         <div class="formula">H(u,v) = e^(-D²(u,v) / 2D0²)</div>
-
         <div style="font-size:0.82rem;font-weight:700;color:var(--text-primary);margin:12px 0 6px">Laplacian (주파수 도메인)</div>
         <div class="formula">H(u,v) = -(u² + v²)
 샤프닝: f(x,y) - g(x,y)
 블러링: f(x,y) + g(x,y)</div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">🔬 Homomorphic Filtering — 어려운 내용</div>
       <div class="card-body">
-        <div class="important">💡 쉽게 말하면: 이미지 = 조명(저주파) × 반사율(고주파). 로그를 씌워 곱셈→덧셈으로 바꿔서 각각 처리!</div>
-        <div class="step">
-          <div class="step-num">1</div>
-          <div class="step-text">f(x,y) = i(x,y) × r(x,y) → 로그: ln(f) = ln(i) + ln(r)</div>
-        </div>
-        <div class="step">
-          <div class="step-num">2</div>
-          <div class="step-text">DFT 적용 후 필터링 (조명 약화↓ + 반사율 강화↑)</div>
-        </div>
-        <div class="step">
-          <div class="step-num">3</div>
-          <div class="step-text">Inverse DFT → 지수함수(exp)로 복원</div>
-        </div>
+        <div class="important">💡 이미지 = 조명(저주파) × 반사율(고주파). 로그를 씌워 곱셈→덧셈으로 바꿔서 각각 처리!</div>
+        <div class="step"><div class="step-num">1</div><div class="step-text">f(x,y) = i(x,y) × r(x,y) → 로그: ln(f) = ln(i) + ln(r)</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">DFT 적용 후 필터링 (조명 약화↓ + 반사율 강화↑)</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text">Inverse DFT → 지수함수(exp)로 복원</div></div>
         <div class="formula">H(u,v) = (γH - γL)(1 - e^(-cD²/D0²)) + γL
 γL &lt; 1, γH &gt; 1</div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">📋 Week 6 과제 요약</div>
       <div class="card-body">
-        <div class="step">
-          <div class="step-num">1</div>
-          <div class="step-text">sample.jpg에 BLPF(n=2)와 GLPF 구현 (D0=30). 결과 비교 분석 2~3문장 주석으로 작성 → 코드 + 이미지 2개</div>
-        </div>
-        <div class="step">
-          <div class="step-num">2</div>
-          <div class="step-text">sample.jpg에 Laplacian 필터 적용 후 샤프닝 이미지 생성 → 코드 + 이미지 2개</div>
-        </div>
+        <div class="step"><div class="step-num">1</div><div class="step-text">sample.jpg에 BLPF(n=2)와 GLPF 구현 (D0=30). 결과 비교 분석 2~3문장 주석으로 작성 → 코드 + 이미지 2개</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">sample.jpg에 Laplacian 필터 적용 후 샤프닝 이미지 생성 → 코드 + 이미지 2개</div></div>
       </div>
     </div>
 
-    <a class="btn-ask" href="homomorphic_filtering_explainer.html" target="_blank">
-      호모모픽 쉽게 보기 ↗
-    </a>
+    <button class="btn-code-toggle" id="toggle-w6" onclick="toggleCode('code-w6')">💻 실습 &amp; 과제 코드 보기 ▾</button>
+    <div class="code-panel" id="code-w6">
+      <div class="code-panel-tabs">
+        <button class="cp-tab active" onclick="switchCodeTab('w6','lab',this)">실습 코드</button>
+        <button class="cp-tab" onclick="switchCodeTab('w6','hw',this)">과제 코드</button>
+        <button class="cp-tab" onclick="switchCodeTab('w6','quiz',this)">빈칸 퀴즈</button>
+      </div>
+      <div class="cp-sec active" id="w6-lab">
+        <div class="cp-card">
+          <div class="cp-card-title">실습 1 · DFT 전체 파이프라인 + 스펙트럼 시각화</div>
+          <div class="cp-desc">Zero-padding → Centering → DFT → 로그 스케일 시각화</div>
+          <pre class="cp-code">import cv2
+import numpy as np
+
+img = cv2.imread('sample.jpg', cv2.IMREAD_GRAYSCALE).astype(float)
+M, N = img.shape
+
+# Step 1: Zero-padding (2M × 2N)
+fp = np.zeros((2*M, 2*N))
+fp[:M, :N] = img
+
+# Step 2: Centering — (-1)^(x+y) 곱하기
+xi  = np.arange(2*M).reshape(-1, 1)
+yi  = np.arange(2*N).reshape(1, -1)
+fpc = fp * ((-1) ** (xi + yi))
+
+# Step 3: DFT
+F = np.fft.fft2(fpc)
+
+# 시각화 (로그 스케일)
+log_mag = np.log1p(np.abs(F))
+vis = (log_mag / log_mag.max() * 255).astype(np.uint8)
+cv2.imwrite('dft_spectrum.jpg', vis)</pre>
+        </div>
+        <div class="cp-card">
+          <div class="cp-card-title">실습 2 · Ideal LPF 필터링</div>
+          <pre class="cp-code">import cv2
+import numpy as np
+
+def ideal_lpf(shape, D0):
+    M, N = shape
+    u = np.arange(M) - M // 2
+    v = np.arange(N) - N // 2
+    V, U = np.meshgrid(v, u)
+    return (np.sqrt(U**2 + V**2) &lt;= D0).astype(float)
+
+img = cv2.imread('sample.jpg', cv2.IMREAD_GRAYSCALE).astype(float)
+M, N = img.shape
+
+fp  = np.zeros((2*M, 2*N));  fp[:M, :N] = img
+xi  = np.arange(2*M).reshape(-1, 1)
+yi  = np.arange(2*N).reshape(1, -1)
+F   = np.fft.fft2(fp * ((-1) ** (xi + yi)))
+
+H = ideal_lpf((2*M, 2*N), D0=30)
+G = F * H
+
+g_pad = np.real(np.fft.ifft2(G)) * ((-1) ** (xi + yi))
+g = np.clip(g_pad[:M, :N], 0, 255).astype(np.uint8)
+cv2.imwrite('lpf_result.jpg', g)</pre>
+        </div>
+        <div class="cp-card">
+          <div class="cp-card-title">실습 3 · Laplacian 필터 + 샤프닝</div>
+          <pre class="cp-code">import cv2
+import numpy as np
+
+img = cv2.imread('sample.jpg', cv2.IMREAD_GRAYSCALE).astype(float)
+M, N = img.shape
+
+fp  = np.zeros((2*M, 2*N));  fp[:M, :N] = img
+xi  = np.arange(2*M).reshape(-1, 1)
+yi  = np.arange(2*N).reshape(1, -1)
+F   = np.fft.fft2(fp * ((-1) ** (xi + yi)))
+
+# Laplacian: H(u,v) = -(u² + v²)
+# 중심 (M, N) 기준 좌표
+u = np.arange(2*M) - M
+v = np.arange(2*N) - N
+V, U = np.meshgrid(v, u)
+H_lap = -(U**2 + V**2)
+
+g_pad = np.real(np.fft.ifft2(F * H_lap)) * ((-1) ** (xi + yi))
+g     = g_pad[:M, :N]
+g_norm = (g - g.min()) / (g.max() - g.min()) * 255
+
+# 샤프닝: 원본 - 필터 결과
+sharpened = np.clip(img - g_norm, 0, 255).astype(np.uint8)
+
+cv2.imwrite('laplacian_g.jpg', g_norm.astype(np.uint8))
+cv2.imwrite('sharpened.jpg',   sharpened)</pre>
+        </div>
+      </div>
+      <div class="cp-sec" id="w6-hw">
+        <div class="cp-card">
+          <div class="cp-card-title">과제 1 · BLPF vs GLPF 비교 (D0=30)</div>
+          <div class="cp-ok">제출: 코드 1개(분석 주석 포함) + 결과 이미지 2개 (blpf_result.jpg / glpf_result.jpg)</div>
+          <pre class="cp-code">import cv2
+import numpy as np
+
+# ── DFT 헬퍼 함수 ──────────────────────────────────────
+def dft_forward(img):
+    M, N = img.shape
+    fp   = np.zeros((2*M, 2*N))
+    fp[:M, :N] = img
+    xi = np.arange(2*M).reshape(-1, 1)
+    yi = np.arange(2*N).reshape(1, -1)
+    F  = np.fft.fft2(fp * ((-1) ** (xi + yi)))
+    return F, xi, yi, M, N
+
+def dft_inverse(G, xi, yi, M, N):
+    g_pad = np.real(np.fft.ifft2(G)) * ((-1) ** (xi + yi))
+    return np.clip(g_pad[:M, :N], 0, 255).astype(np.uint8)
+
+# ── D(u,v): 중심(M, N) 기준 거리 행렬 ────────────────
+def compute_D(M, N):
+    u = np.arange(2*M) - M
+    v = np.arange(2*N) - N
+    V, U = np.meshgrid(v, u)
+    return np.sqrt(U**2 + V**2)
+
+# ── BLPF: H = 1 / (1 + (D/D0)^(2n)) ─────────────────
+def blpf(M, N, D0, n=2):
+    D = compute_D(M, N)
+    return 1 / (1 + (D / D0) ** (2 * n))
+
+# ── GLPF: H = exp(-D² / 2D0²) ────────────────────────
+def glpf(M, N, D0):
+    D = compute_D(M, N)
+    return np.exp(-D**2 / (2 * D0**2))
+
+# ── 메인 ─────────────────────────────────────────────
+img = cv2.imread('sample.jpg', cv2.IMREAD_GRAYSCALE).astype(float)
+F, xi, yi, M, N = dft_forward(img)
+D0 = 30
+
+for name, H in [('blpf', blpf(M, N, D0, n=2)),
+                ('glpf', glpf(M, N, D0))]:
+    out = dft_inverse(F * H, xi, yi, M, N)
+    cv2.imwrite(f'{name}_result.jpg', out)
+
+# [분석 주석 — 반드시 포함]
+# BLPF (n=2, D0=30):
+#   엣지 경계가 비교적 선명하게 유지됨.
+#   링잉(ringing) 아티팩트가 엣지 근처에서 약간 발생.
+# GLPF (D0=30):
+#   엣지가 더 부드럽게 번지고 전환이 점진적.
+#   링잉 아티팩트 없음. 더 자연스러운 블러 효과.
+# 결론: BLPF가 더 선명하지만 링잉 있고,
+#        GLPF는 부드럽지만 흐림이 약간 더 많음.</pre>
+        </div>
+        <div class="cp-card">
+          <div class="cp-card-title">과제 2 · Laplacian 샤프닝</div>
+          <div class="cp-ok">제출: 코드 1개 + 이미지 2개 (laplacian_filtered.jpg / sharpened_result.jpg)</div>
+          <pre class="cp-code">import cv2
+import numpy as np
+
+img = cv2.imread('sample.jpg', cv2.IMREAD_GRAYSCALE).astype(float)
+M, N = img.shape
+
+fp  = np.zeros((2*M, 2*N));  fp[:M, :N] = img
+xi  = np.arange(2*M).reshape(-1, 1)
+yi  = np.arange(2*N).reshape(1, -1)
+F   = np.fft.fft2(fp * ((-1) ** (xi + yi)))
+
+# Laplacian: H(u,v) = -(u² + v²)
+u = np.arange(2*M) - M
+v = np.arange(2*N) - N
+V, U   = np.meshgrid(v, u)
+H_lap  = -(U**2 + V**2)
+
+g_pad  = np.real(np.fft.ifft2(F * H_lap)) * ((-1) ** (xi + yi))
+g      = g_pad[:M, :N]
+g_norm = (g - g.min()) / (g.max() - g.min()) * 255
+
+# 샤프닝: f(x,y) - g(x,y)
+sharpened = np.clip(img - g_norm, 0, 255).astype(np.uint8)
+
+cv2.imwrite('laplacian_filtered.jpg', g_norm.astype(np.uint8))
+cv2.imwrite('sharpened_result.jpg',   sharpened)</pre>
+        </div>
+      </div>
+      <div class="cp-sec" id="w6-quiz">
+        <div class="cp-score-row">
+          <div class="cp-sc"><span class="cp-sc-n" id="cq-w6-c">0</span><span class="cp-sc-l">맞음</span></div>
+          <div class="cp-sc"><span class="cp-sc-n" id="cq-w6-t">0</span><span class="cp-sc-l">채점함</span></div>
+          <div class="cp-sc"><span class="cp-sc-n" id="cq-w6-p">0%</span><span class="cp-sc-l">정답률</span></div>
+        </div>
+        <div id="cq-w6-list"></div>
+      </div>
+    </div>
+
+    <button class="btn-ask" onclick="window.open('homomorphic_filtering_explainer.html','_blank')">호모모픽 쉽게 보기 ↗</button>
   </div>
 
-  <!-- ════════════════════════════════
-       QUIZ
-  ════════════════════════════════ -->
+  <!-- ════ QUIZ ════ -->
   <div class="section" id="tab-quiz">
-
     <div class="card">
       <span class="badge badge-purple">실력 점검 퀴즈</span>
       <div class="card-title">🧠 시험 예상 문제</div>
       <div class="score-display" id="score-display">0 / 0</div>
       <div class="score-label" id="score-label">아직 풀지 않았어요. 시작해 보세요!</div>
     </div>
-
     <div id="quiz-container"></div>
   </div>
 
 </div><!-- /page-wrap -->
 
 <script src="script.js"></script>
+
+<script>
+/* ── 토글: 코드 패널 열기/닫기 ── */
+function toggleCode(panelId) {
+  var panel  = document.getElementById(panelId);
+  var isOpen = panel.classList.toggle('open');
+  var btn    = panel.previousElementSibling;
+  btn.innerHTML = btn.innerHTML.replace(
+    isOpen ? '▾' : '▴',
+    isOpen ? '▴' : '▾'
+  );
+}
+
+/* ── 내부 탭 전환 ── */
+function switchCodeTab(wk, secId, clickedBtn) {
+  var panel = clickedBtn.closest('.code-panel');
+  panel.querySelectorAll('.cp-sec').forEach(function(s) { s.classList.remove('active'); });
+  panel.querySelectorAll('.cp-tab').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById(wk + '-' + secId).classList.add('active');
+  clickedBtn.classList.add('active');
+}
+
+/* ── 코드 퀴즈 데이터 ── */
+var cqData = {
+  w4: [
+    {
+      q:    'Zone Plate를 stride 간격으로 샘플링 (행·열 모두 동일 간격)',
+      tmpl: 'sampled = zone[::___A___, ::___A___]',
+      ans:  { A: 'stride' },
+      hint: { A: '행과 열 모두 같은 간격 변수명' },
+      exp:  'zone[::stride, ::stride] — 행과 열 모두 stride 간격으로 픽셀 선택.'
+    },
+    {
+      q:    'GaussianBlur 적용: 커널 (9,9), sigma=0 (자동 계산)',
+      tmpl: 'blurred = cv2.___A___(zone, (9, 9), ___B___)',
+      ans:  { A: 'GaussianBlur', B: '0' },
+      hint: { A: '가우시안 블러 OpenCV 함수명', B: 'sigma=0이면 커널 크기로 자동 계산' },
+      exp:  'cv2.GaussianBlur(src, ksize, sigmaX). sigmaX=0은 ksize 기반 자동 sigma.'
+    },
+    {
+      q:    'Bilinear 가로 보간: y0행의 x0, x1 두 픽셀을 tx 비율로 혼합',
+      tmpl: 'r1 = img[y0, x0] * (1 - ___A___) + img[y0, x1] * ___A___',
+      ans:  { A: 'tx' },
+      hint: { A: '가로 방향 소수점 비율 (0~1)' },
+      exp:  '선형 보간: a*(1-t)+b*t. tx = ox - x0 (소수 부분).'
+    },
+    {
+      q:    'sampled를 원본 크기로 Nearest Neighbor 보간으로 복원',
+      tmpl: 'restored = cv2.resize(sampled, (W, H),\n    interpolation=cv2.___A___)',
+      ans:  { A: 'INTER_NEAREST' },
+      hint: { A: 'Nearest Neighbor 보간 상수' },
+      exp:  'cv2.INTER_NEAREST = Nearest Neighbor 보간. 가장 가까운 픽셀 값을 그대로 사용.'
+    }
+  ],
+  w5: [
+    {
+      q:    'np.histogram에 2D 이미지를 입력하려면 먼저 1D로 변환',
+      tmpl: 'hist, _ = np.histogram(gray.___A___(), 256, [0, 256])',
+      ans:  { A: 'flatten' },
+      hint: { A: '2D 배열을 1D로 펼치는 NumPy 메서드' },
+      exp:  'flatten()으로 (H,W) 배열 → 1D 배열 변환 후 histogram 계산.'
+    },
+    {
+      q:    'hist로부터 CDF(누적 분포 함수) 계산',
+      tmpl: 'cdf = hist.___A___()',
+      ans:  { A: 'cumsum' },
+      hint: { A: 'cumulative sum — 왼쪽부터 누적합산' },
+      exp:  'cumsum()은 배열을 왼쪽부터 누적으로 더해나가는 함수.'
+    },
+    {
+      q:    'CDF_min: CDF 중 0인 구간을 제외한 최솟값',
+      tmpl: 'cdf_min = cdf[cdf > ___A___].___B___()',
+      ans:  { A: '0', B: 'min' },
+      hint: { A: '0보다 큰 값만 필터링', B: '최솟값 메서드' },
+      exp:  'cdf[cdf>0].min() — 픽셀이 없는 구간(CDF=0)은 반드시 제외.'
+    },
+    {
+      q:    '평활화 공식으로 LUT 생성 후 이미지에 적용',
+      tmpl: 'lut = np.round(\n    (cdf - cdf_min) / (cdf_max - cdf_min) * ___A___\n).astype(np.uint8)\nresult = lut[___B___]',
+      ans:  { A: '255', B: 'gray' },
+      hint: { A: 'L-1 = 최대 픽셀 값 (256-1)', B: 'LUT를 적용할 원본 이미지 변수' },
+      exp:  'L-1=255. lut[gray]로 gray의 각 픽셀 값을 LUT 인덱스로 변환.'
+    }
+  ],
+  w6: [
+    {
+      q:    'Zero-padding: 원본 이미지를 2M×2N 배열의 왼쪽 위 영역에 복사',
+      tmpl: 'fp = np.zeros((2*M, 2*N))\nfp[___A___, ___B___] = img',
+      ans:  { A: ':M', B: ':N' },
+      hint: { A: '0번째부터 M번째 행까지', B: '0번째부터 N번째 열까지' },
+      exp:  'fp[:M, :N] = img — 왼쪽 위 M×N 영역에 원본 복사, 나머지는 0.'
+    },
+    {
+      q:    'Centering: (-1)^(x+y)를 곱해 저주파를 스펙트럼 중앙으로 이동',
+      tmpl: 'fpc = fp * (___A___ ** (xi + yi))',
+      ans:  { A: '(-1)' },
+      hint: { A: '부호를 교대로 바꾸는 수' },
+      exp:  '(-1)^(x+y) 체커보드 패턴 — 이를 곱하면 DFT 결과의 저주파가 중앙으로 이동.'
+    },
+    {
+      q:    'Butterworth LPF: H = 1 / (1 + (D/D0)^(2n))',
+      tmpl: 'H = 1 / (1 + (D / ___A___) ** (2 * ___B___))',
+      ans:  { A: 'D0', B: 'n' },
+      hint: { A: 'cutoff frequency 변수', B: '필터 차수(order) 변수' },
+      exp:  'BLPF: 1/(1+(D/D0)^2n). D0에서 H=0.5. n=2가 일반적 기본값.'
+    },
+    {
+      q:    'Gaussian LPF: H = exp(-D²/2D0²)',
+      tmpl: 'H = np.___A___(-D**2 / (2 * D0**___B___))',
+      ans:  { A: 'exp', B: '2' },
+      hint: { A: 'e^x를 계산하는 NumPy 함수', B: 'D0의 제곱' },
+      exp:  'GLPF: np.exp(-D²/(2*D0²)). D0**2로 제곱 계산.'
+    },
+    {
+      q:    'Laplacian 필터 H(u,v)=-(u²+v²), 샤프닝은 원본에서 필터 결과를 뺌',
+      tmpl: 'H_lap = -(___A___**2 + V**2)\n...\nsharpened = img ___B___ g_norm',
+      ans:  { A: 'U', B: '-' },
+      hint: { A: '가로 주파수 좌표 변수', B: '샤프닝 = 원본 - 필터 결과' },
+      exp:  'H=-(U²+V²). 샤프닝=f-g(원본에서 빼기), 블러링=f+g(더하기).'
+    },
+    {
+      q:    'IDFT 후 de-centering 적용 + zero-padding 제거',
+      tmpl: 'g_pad = np.real(np.fft.___A___(G)) * ((-1) ** (xi + yi))\ng = g_pad[___B___, :N]',
+      ans:  { A: 'ifft2', B: ':M' },
+      hint: { A: '2D Inverse FFT 함수', B: '원본 M행까지 슬라이싱으로 패딩 제거' },
+      exp:  'ifft2()로 역변환 후 (-1)^(x+y) 곱해 de-centering. [:M,:N]으로 패딩 제거.'
+    }
+  ]
+};
+
+var cqState = {};
+
+/* ── 퀴즈 HTML 생성 ── */
+function buildCQ() {
+  ['w4', 'w5', 'w6'].forEach(function(wk) {
+    var container = document.getElementById('cq-' + wk + '-list');
+    if (!container) return;
+    cqData[wk].forEach(function(q, i) {
+      var id   = wk + '_' + i;
+      var code = q.tmpl;
+      Object.keys(q.ans).forEach(function(k) {
+        code = code.replace(new RegExp('___' + k + '___', 'g'),
+          '<input class="cq-inp" id="cqi-' + id + '-' + k +
+          '" placeholder="' + k + '" oninput="cqClear(\'' + id + '\')">');
+      });
+      var div = document.createElement('div');
+      div.className = 'cq-item';
+      div.id = 'cqi-card-' + id;
+      div.innerHTML =
+        '<div class="cq-q">Q' + (i + 1) + '. ' + q.q + '</div>' +
+        '<div class="cq-code">' + code + '</div>' +
+        '<div class="cq-btn-row">' +
+          '<button class="cq-btn-check" onclick="cqCheck(\'' + id + '\',\'' + wk + '\',' + i + ')">채점</button>' +
+          '<button class="cq-btn-hint"  onclick="cqHint(\'' + id + '\',\'' + wk + '\',' + i + ')">힌트</button>' +
+        '</div>' +
+        '<div class="cq-fb" id="cqfb-' + id + '"></div>';
+      container.appendChild(div);
+    });
+  });
+}
+
+function cqClear(id) {
+  var fb = document.getElementById('cqfb-' + id);
+  if (fb) fb.className = 'cq-fb';
+}
+
+function cqCheck(id, wk, qi) {
+  var q = cqData[wk][qi];
+  var allOk = true, wrong = [];
+  Object.keys(q.ans).forEach(function(k) {
+    var inp = document.getElementById('cqi-' + id + '-' + k);
+    if (!inp) return;
+    var ok = inp.value.trim() === q.ans[k];
+    inp.className = 'cq-inp ' + (ok ? 'ok2' : 'ng2');
+    if (!ok) { allOk = false; wrong.push(k); }
+  });
+  cqState[id] = { checked: true, correct: allOk };
+  var fb   = document.getElementById('cqfb-' + id);
+  var card = document.getElementById('cqi-card-' + id);
+  if (allOk) {
+    fb.className   = 'cq-fb show ok3';
+    fb.textContent = '✓ 정답! ' + q.exp;
+    card.className = 'cq-item ok-card';
+  } else {
+    var hints = wrong.map(function(k) { return '[' + k + '] ' + q.hint[k]; }).join(' / ');
+    fb.className   = 'cq-fb show ng3';
+    fb.textContent = '✗ 틀렸어요. 힌트: ' + hints + ' | 해설: ' + q.exp;
+    card.className = 'cq-item ng-card';
+  }
+  cqUpdateScore(wk);
+}
+
+function cqHint(id, wk, qi) {
+  var q = cqData[wk][qi];
+  var fb = document.getElementById('cqfb-' + id);
+  var hints = Object.keys(q.hint).map(function(k) { return '[' + k + '] ' + q.hint[k]; }).join(' / ');
+  fb.className   = 'cq-fb show hint3';
+  fb.textContent = '💡 힌트: ' + hints;
+}
+
+function cqUpdateScore(wk) {
+  var total = 0, correct = 0, n = cqData[wk].length;
+  for (var i = 0; i < n; i++) {
+    var id = wk + '_' + i;
+    if (cqState[id] && cqState[id].checked) {
+      total++;
+      if (cqState[id].correct) correct++;
+    }
+  }
+  document.getElementById('cq-' + wk + '-c').textContent = correct;
+  document.getElementById('cq-' + wk + '-t').textContent = total;
+  document.getElementById('cq-' + wk + '-p').textContent =
+    total ? Math.round(correct / total * 100) + '%' : '0%';
+}
+
+buildCQ();
+</script>
 </body>
 </html>
