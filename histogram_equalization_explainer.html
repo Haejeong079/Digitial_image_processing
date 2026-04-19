@@ -1,0 +1,434 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.wrap{padding:1rem 0}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:12px}
+.card-title{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px}
+.lbl{font-size:13px;color:var(--color-text-secondary);line-height:1.7}
+.analogy{background:#EEEDFE;border-left:3px solid #534AB7;padding:10px 14px;margin:8px 0;font-size:13px;color:#3C3489;line-height:1.7}
+.ok{background:#EAF3DE;border-left:3px solid #3B6D11;padding:10px 14px;margin:8px 0;font-size:13px;color:#27500A;line-height:1.7}
+.warn{background:#FAEEDA;border-left:3px solid #854F0B;padding:10px 14px;margin:8px 0;font-size:13px;color:#633806;line-height:1.7}
+.step-btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.sbtn{padding:7px 13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:12px;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);white-space:nowrap}
+.sbtn.on{background:#534AB7;color:#EEEDFE;border-color:#534AB7}
+.step-desc{font-size:13px;color:var(--color-text-secondary);line-height:1.7;padding:10px 12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin-bottom:10px;min-height:54px}
+canvas{display:block;border-radius:8px;border:0.5px solid var(--color-border-tertiary)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+@media(max-width:500px){.two-col{grid-template-columns:1fr}}
+.col-lbl{font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:5px;text-align:center}
+.table-wrap{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th{background:var(--color-background-secondary);color:var(--color-text-secondary);font-weight:500;padding:6px 10px;border:0.5px solid var(--color-border-tertiary);text-align:center}
+td{padding:6px 10px;border:0.5px solid var(--color-border-tertiary);text-align:center;color:var(--color-text-primary)}
+tr.hl td{background:#EEEDFE;color:#3C3489;font-weight:500}
+.formula-box{background:#EEEDFE;border-radius:var(--border-radius-md);padding:12px 16px;text-align:center;margin:8px 0;font-size:14px;color:#3C3489;font-family:var(--font-mono)}
+.px-grid{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0}
+.px-cell{width:40px;height:40px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;border:0.5px solid var(--color-border-tertiary)}
+.codeblock{font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:10px 14px;border-radius:var(--border-radius-md);color:var(--color-text-primary);line-height:1.8;white-space:pre;overflow-x:auto;margin:8px 0}
+</style>
+
+<div class="wrap">
+
+<div class="card">
+  <div class="card-title">단계별로 이해하기</div>
+  <div class="step-btn-row">
+    <button class="sbtn on" id="sb0" onclick="setStep(0)">1단계: 문제 상황</button>
+    <button class="sbtn" id="sb1" onclick="setStep(1)">2단계: 히스토그램</button>
+    <button class="sbtn" id="sb2" onclick="setStep(2)">3단계: CDF 누적합</button>
+    <button class="sbtn" id="sb3" onclick="setStep(3)">4단계: 공식 적용</button>
+    <button class="sbtn" id="sb4" onclick="setStep(4)">5단계: 결과 비교</button>
+  </div>
+  <div class="step-desc" id="step-desc"></div>
+  <canvas id="main-canvas" height="220" style="width:100%"></canvas>
+</div>
+
+<div class="card">
+  <div class="card-title">공식 파헤치기</div>
+  <div class="formula-box">h(v) = round( (CDF(v) - CDF_min) / (CDF_max - CDF_min) × 255 )</div>
+  <div class="lbl" style="margin-top:8px">변수가 헷갈리죠? 아래 표에서 하나씩 확인해보세요.</div>
+  <div class="table-wrap">
+    <table>
+      <tr><th>변수</th><th>뜻</th><th>예시 (아래 8픽셀 기준)</th></tr>
+      <tr><td><b>v</b></td><td>지금 처리 중인 픽셀 값 (0~255)</td><td>v = 50 이라면 밝기 50인 픽셀</td></tr>
+      <tr><td><b>CDF(v)</b></td><td>v 이하인 픽셀이 몇 개인지 누적 합계</td><td>CDF(50) = 3 → 50 이하 픽셀 3개</td></tr>
+      <tr class="hl"><td><b>CDF_min</b></td><td>CDF 중 0이 아닌 가장 작은 값</td><td>첫 번째로 등장하는 픽셀의 CDF 값</td></tr>
+      <tr><td><b>CDF_max</b></td><td>전체 픽셀 수</td><td>픽셀이 8개면 CDF_max = 8</td></tr>
+      <tr><td><b>255</b></td><td>최대 밝기 (L-1)</td><td>흑백 이미지 최댓값 = 255</td></tr>
+    </table>
+  </div>
+  <div class="analogy">비유: 공식은 "현재 픽셀이 전체에서 몇 번째로 밝은가?" 를 0~255 사이로 다시 표현하는 것이에요!</div>
+</div>
+
+<div class="card">
+  <div class="card-title">직접 계산해보는 예시 — 8개 픽셀</div>
+  <div class="lbl" style="margin-bottom:8px">픽셀 값: 50, 50, 80, 80, 80, 120, 200, 200 (어두운 쪽에 몰려있는 상황)</div>
+  <div class="px-grid" id="before-px"></div>
+  <div class="table-wrap">
+    <table id="calc-table">
+      <tr><th>픽셀값 v</th><th>개수 (hist)</th><th>CDF(v)</th><th>계산 과정</th><th>결과 h(v)</th></tr>
+    </table>
+  </div>
+  <div class="lbl" style="margin-top:8px">평활화 후 픽셀:</div>
+  <div class="px-grid" id="after-px"></div>
+  <div class="ok">같은 비율 관계를 유지하면서 전체 0~255 범위로 쭉 펼쳐졌어요!</div>
+</div>
+
+<div class="card">
+  <div class="card-title">코드로 구현하기 (과제 핵심!)</div>
+  <div class="codeblock">gray = cv2.imread('bean.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Step 1: 히스토그램 계산
+hist, _ = np.histogram(gray.flatten(), 256, [0, 256])
+
+# Step 2: CDF 계산 (누적합)
+cdf = hist.cumsum()
+
+# Step 3: CDF_min (0 제외한 최솟값)
+cdf_min = cdf[cdf > 0].min()
+cdf_max = cdf.max()   # = 전체 픽셀 수
+
+# Step 4: 공식 적용 → LUT(변환표) 만들기
+lut = np.round(
+    (cdf - cdf_min) / (cdf_max - cdf_min) * 255
+).astype(np.uint8)
+
+# Step 5: 원본 이미지에 LUT 적용
+result = lut[gray]</div>
+  <div class="warn">cv2.equalizeHist() 쓰면 미제출 처리! 반드시 위 공식으로 직접 구현해야 해요.</div>
+</div>
+
+</div>
+
+<script>
+var STEP = 0;
+
+var stepDescs = [
+  '사진이 전체적으로 너무 어둡거나 밝으면 어떻게 될까요? 픽셀 값들이 한쪽에만 몰려서 세부 표현이 사라져버려요. 예를 들어 픽셀 값이 전부 50~80 사이에만 있다면, 어두운 부분 차이가 거의 안 보여요.',
+  '히스토그램은 "픽셀 값별로 몇 개의 픽셀이 있는지" 막대 그래프로 나타낸 거예요. 왼쪽(어두움)에 막대가 몰려있으면 → 이미지가 전체적으로 어둡다는 뜻이에요!',
+  'CDF(누적합)는 "이 값 이하인 픽셀이 총 몇 개냐?" 를 쭉 더해가는 거예요. 막대기를 왼쪽부터 오른쪽으로 차례로 더해나가면 돼요. 마치 점수를 하나씩 합산하는 것처럼요!',
+  '공식 h(v) = round((CDF(v) - CDF_min) / (CDF_max - CDF_min) × 255) 를 적용하면, 한쪽에 몰린 픽셀들을 0~255 전체 범위로 균등하게 펼쳐줘요!',
+  '평활화 전/후 히스토그램을 비교해보세요. 왼쪽에 몰려있던 막대들이 오른쪽 전체로 고르게 펼쳐졌어요. 이미지의 대비(contrast)가 높아져서 어두운 부분도 잘 보이게 됩니다!'
+];
+
+var pixels = [50, 50, 80, 80, 80, 120, 200, 200];
+var uniqueVals = [50, 80, 120, 200];
+var hist = {50:2, 80:3, 120:1, 200:2};
+var cdf  = {50:2, 80:5, 120:6, 200:8};
+var cdfMin = 2, cdfMax = 8;
+
+function calcHV(v){
+  return Math.round((cdf[v] - cdfMin) / (cdfMax - cdfMin) * 255);
+}
+
+var hvMap = {};
+uniqueVals.forEach(function(v){ hvMap[v] = calcHV(v); });
+
+function setStep(i){
+  STEP = i;
+  for(var k=0;k<5;k++){
+    document.getElementById('sb'+k).className = 'sbtn' + (k===i?' on':'');
+  }
+  document.getElementById('step-desc').textContent = stepDescs[i];
+  drawMain();
+}
+
+function isDark(){ return window.matchMedia('(prefers-color-scheme: dark)').matches; }
+function tc(){ return isDark() ? '#c2c0b6' : '#3d3d3a'; }
+function mc(){ return isDark() ? '#7a7870' : '#9a9890'; }
+function gc(){ return isDark() ? '#3a3835' : '#dddbd4'; }
+function bg2(){ return isDark() ? '#2a2826' : '#f5f3ee'; }
+
+function drawMain(){
+  var canvas = document.getElementById('main-canvas');
+  canvas.width = canvas.offsetWidth || 600;
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  if(STEP === 0) drawStep0(ctx,W,H);
+  else if(STEP === 1) drawHistogram(ctx,W,H, false);
+  else if(STEP === 2) drawCDF(ctx,W,H);
+  else if(STEP === 3) drawFormula(ctx,W,H);
+  else if(STEP === 4) drawComparison(ctx,W,H);
+}
+
+function drawStep0(ctx,W,H){
+  var n = 16;
+  var cellW = Math.floor(W/n);
+  var cellH = H - 40;
+  for(var i=0;i<n;i++){
+    var t = i/(n-1);
+    var gray = Math.round(30 + t*80);
+    ctx.fillStyle = 'rgb('+gray+','+gray+','+gray+')';
+    ctx.fillRect(i*cellW, 20, cellW, cellH);
+  }
+  ctx.fillStyle = tc(); ctx.font = '12px sans-serif';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.fillText('픽셀 값 30 (어두움)', 4, 4);
+  ctx.textAlign = 'right';
+  ctx.fillText('픽셀 값 110 (아직도 어둡다)', W-4, 4);
+  ctx.fillStyle = '#E24B4A'; ctx.font = '500 12px sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+  ctx.fillText('0~255 범위 중 30~110에만 몰려있음 → 대비가 낮아 뿌옇게 보임', W/2, H-2);
+}
+
+function drawHistogram(ctx, W, H, isCDF){
+  var vals = uniqueVals;
+  var barW = 50;
+  var gap = Math.floor((W - vals.length * barW) / (vals.length + 1));
+  var maxH = H - 70;
+  var maxCount = isCDF ? cdfMax : 3;
+
+  ctx.fillStyle = mc(); ctx.font = '11px sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+  ctx.fillText(isCDF ? 'CDF (누적합)' : '히스토그램 (개수)', W/2, 16);
+
+  vals.forEach(function(v,i){
+    var count = isCDF ? cdf[v] : hist[v];
+    var bh = Math.round((count / maxCount) * maxH);
+    var bx = gap + i*(barW+gap);
+    var by = H - 40 - bh;
+
+    var grayV = v;
+    ctx.fillStyle = 'rgb('+grayV+','+grayV+','+grayV+')';
+    ctx.fillRect(bx, by, barW, bh);
+
+    ctx.fillStyle = gc();
+    ctx.fillRect(bx, by, barW, bh);
+    ctx.fillStyle = 'rgb('+Math.min(grayV+20,255)+','+Math.min(grayV+20,255)+','+Math.min(grayV+20,255)+')';
+    ctx.globalAlpha = 0.7;
+    ctx.fillRect(bx, by, barW, bh);
+    ctx.globalAlpha = 1;
+
+    ctx.strokeStyle = '#534AB7'; ctx.lineWidth = 1;
+    ctx.strokeRect(bx, by, barW, bh);
+
+    ctx.fillStyle = '#534AB7'; ctx.font = '500 12px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.fillText(count, bx+barW/2, by-2);
+
+    ctx.fillStyle = tc(); ctx.font = '11px sans-serif';
+    ctx.textBaseline = 'top';
+    ctx.fillText('v='+v, bx+barW/2, H-36);
+    ctx.fillStyle = mc();
+    ctx.fillText('('+['어두움','중간','밝음','아주밝음'][i]+')', bx+barW/2, H-22);
+  });
+
+  ctx.strokeStyle = gc(); ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(0, H-40); ctx.lineTo(W, H-40); ctx.stroke();
+}
+
+function drawCDF(ctx,W,H){
+  var vals = uniqueVals;
+  var barW = 50;
+  var gap = Math.floor((W - vals.length * barW) / (vals.length + 1));
+  var maxH = H - 70;
+
+  ctx.fillStyle = mc(); ctx.font = '11px sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+  ctx.fillText('CDF — 왼쪽부터 누적합산', W/2, 16);
+
+  var running = 0;
+  vals.forEach(function(v,i){
+    running += hist[v];
+    var bh = Math.round((running / cdfMax) * maxH);
+    var bx = gap + i*(barW+gap);
+    var by = H - 40 - bh;
+
+    ctx.fillStyle = '#EEEDFE';
+    ctx.fillRect(bx, by, barW, bh);
+    ctx.strokeStyle = '#534AB7'; ctx.lineWidth = 1.5;
+    ctx.strokeRect(bx, by, barW, bh);
+
+    ctx.fillStyle = '#3C3489'; ctx.font = '500 13px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.fillText(running, bx+barW/2, by-2);
+
+    if(i > 0){
+      ctx.fillStyle = mc(); ctx.font = '10px sans-serif';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('+'+hist[v], bx+barW/2, by-16);
+    }
+
+    ctx.fillStyle = tc(); ctx.font = '11px sans-serif';
+    ctx.textBaseline = 'top';
+    ctx.fillText('v='+v, bx+barW/2, H-36);
+
+    if(i === 0){
+      ctx.fillStyle = '#993C1D'; ctx.font = '500 10px sans-serif';
+      ctx.fillText('CDF_min='+running, bx+barW/2, H-22);
+    } else if(i === vals.length-1){
+      ctx.fillStyle = '#3B6D11'; ctx.font = '500 10px sans-serif';
+      ctx.fillText('CDF_max='+running, bx+barW/2, H-22);
+    }
+
+    if(i < vals.length-1){
+      var nx = gap + (i+1)*(barW+gap);
+      ctx.strokeStyle = '#AFA9EC'; ctx.lineWidth = 1;
+      ctx.setLineDash([4,3]);
+      ctx.beginPath();
+      ctx.moveTo(bx+barW, H-40);
+      ctx.lineTo(nx, H-40);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#7F77DD'; ctx.font = '11px sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('+'+hist[vals[i+1]], bx+barW+(nx-bx-barW)/2, H-34);
+    }
+  });
+
+  ctx.strokeStyle = gc(); ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(0, H-40); ctx.lineTo(W, H-40); ctx.stroke();
+}
+
+function drawFormula(ctx,W,H){
+  var vals = uniqueVals;
+  var barW = 50;
+  var gap = Math.floor((W - vals.length * barW) / (vals.length + 1));
+  var maxH = H - 90;
+
+  ctx.fillStyle = mc(); ctx.font = '11px sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+  ctx.fillText('공식 적용: 각 픽셀 값 → 새 픽셀 값', W/2, 16);
+
+  vals.forEach(function(v,i){
+    var bx = gap + i*(barW+gap);
+    var hv = hvMap[v];
+
+    var oldBH = Math.round((v / 255) * maxH * 0.6 + 10);
+    var newBH = Math.round((hv / 255) * maxH * 0.6 + 10);
+
+    var oldY = H - 50 - oldBH;
+    var newY = H - 50 - newBH;
+    var halfW = Math.floor(barW/2) - 2;
+
+    var gOld = v;
+    ctx.fillStyle = 'rgb('+gOld+','+gOld+','+gOld+')';
+    ctx.globalAlpha = 0.6;
+    ctx.fillRect(bx, oldY, halfW, oldBH);
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = gc(); ctx.lineWidth = 0.5;
+    ctx.strokeRect(bx, oldY, halfW, oldBH);
+
+    var gNew = hv;
+    ctx.fillStyle = '#EEEDFE';
+    ctx.fillRect(bx+halfW+4, newY, halfW, newBH);
+    ctx.strokeStyle = '#534AB7'; ctx.lineWidth = 1;
+    ctx.strokeRect(bx+halfW+4, newY, halfW, newBH);
+
+    ctx.fillStyle = tc(); ctx.font = '10px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.fillText(v, bx+halfW/2, oldY-2);
+    ctx.fillStyle = '#3C3489'; ctx.font = '500 10px sans-serif';
+    ctx.fillText(hv, bx+halfW+4+halfW/2, newY-2);
+
+    ctx.fillStyle = '#534AB7'; ctx.font = '11px sans-serif';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+    ctx.fillText('→', bx+halfW+2, H-50-(Math.min(oldBH,newBH)/2));
+
+    ctx.fillStyle = tc(); ctx.font = '10px sans-serif';
+    ctx.textBaseline = 'top';
+    ctx.fillText('v='+v, bx+barW/2, H-46);
+  });
+
+  ctx.fillStyle = mc(); ctx.font = '10px sans-serif';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+  ctx.fillText('회색=원본 / 보라=평활화 후', 8, H-2);
+  ctx.strokeStyle = gc(); ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(0,H-50); ctx.lineTo(W,H-50); ctx.stroke();
+}
+
+function drawComparison(ctx,W,H){
+  var half = Math.floor(W/2) - 8;
+  var barW = 20, gap2 = 4;
+  var maxH = H - 60;
+
+  function drawHist(ox, vals2, counts, label, col){
+    var maxC = Math.max.apply(null, Object.values ? Object.values(counts) : vals2.map(function(v){ return counts[v]; }));
+    ctx.fillStyle = mc(); ctx.font = '11px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.fillText(label, ox+half/2, 16);
+
+    var n = vals2.length;
+    var totalW = n*(barW+gap2);
+    var startX = ox + Math.floor((half - totalW)/2);
+
+    vals2.forEach(function(v,i){
+      var c = counts[v] || 0;
+      var bh = Math.round((c/maxC)*maxH*0.8);
+      var bx = startX + i*(barW+gap2);
+      var by = H-40-bh;
+      ctx.fillStyle = col; ctx.fillRect(bx,by,barW,bh);
+      ctx.strokeStyle = isDark()?'#444':'#ccc'; ctx.lineWidth=0.5; ctx.strokeRect(bx,by,barW,bh);
+      ctx.fillStyle = tc(); ctx.font='9px sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='top';
+      ctx.fillText(v, bx+barW/2, H-36);
+    });
+    ctx.strokeStyle=gc(); ctx.lineWidth=0.5;
+    ctx.beginPath(); ctx.moveTo(ox,H-40); ctx.lineTo(ox+half,H-40); ctx.stroke();
+  }
+
+  var afterVals = uniqueVals.map(function(v){ return hvMap[v]; });
+  var afterCounts = {};
+  uniqueVals.forEach(function(v){ afterCounts[hvMap[v]] = hist[v]; });
+
+  drawHist(4, uniqueVals, hist, '평활화 전 (한쪽에 몰림)', '#888888');
+  drawHist(half+12, afterVals, afterCounts, '평활화 후 (고르게 펼쳐짐)', '#7F77DD');
+
+  ctx.strokeStyle = gc(); ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(half+8, 20); ctx.lineTo(half+8, H-10); ctx.stroke();
+  ctx.fillStyle = '#534AB7'; ctx.font='500 18px sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('→', half+8, H/2);
+}
+
+function buildTable(){
+  var t = document.getElementById('calc-table');
+  var cdfRunning = 0;
+  uniqueVals.forEach(function(v){
+    cdfRunning += hist[v];
+    var hv = hvMap[v];
+    var formula = '('+cdfRunning+'-'+cdfMin+')/('+cdfMax+'-'+cdfMin+')×255';
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td>'+v+'</td><td>'+hist[v]+'개</td><td>'+cdfRunning+'</td><td style="font-family:var(--font-mono);font-size:11px">'+formula+' ≈ '+hv+'</td><td style="font-weight:500;color:#534AB7">'+hv+'</td>';
+    t.appendChild(tr);
+  });
+}
+
+function buildPixelGrids(){
+  var bef = document.getElementById('before-px');
+  var aft = document.getElementById('after-px');
+  pixels.forEach(function(v){
+    var d = document.createElement('div');
+    d.className = 'px-cell';
+    d.style.background = 'rgb('+v+','+v+','+v+')';
+    d.style.color = v < 128 ? '#fff' : '#222';
+    d.textContent = v;
+    bef.appendChild(d);
+
+    var hv = hvMap[v];
+    var d2 = document.createElement('div');
+    d2.className = 'px-cell';
+    d2.style.background = 'rgb('+hv+','+hv+','+hv+')';
+    d2.style.color = hv < 128 ? '#fff' : '#222';
+    d2.textContent = hv;
+    aft.appendChild(d2);
+  });
+}
+
+function init(){
+  setStep(0);
+  buildTable();
+  buildPixelGrids();
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  setTimeout(init, 80);
+}
+
+window.addEventListener('resize', function(){ drawMain(); });
+</script>

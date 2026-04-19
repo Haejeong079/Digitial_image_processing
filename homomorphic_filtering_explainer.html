@@ -1,0 +1,401 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.wrap{padding:1rem 0}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:12px}
+.card-title{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:8px}
+.lbl{font-size:13px;color:var(--color-text-secondary);line-height:1.7}
+.analogy{background:#EEEDFE;border-left:3px solid #534AB7;padding:10px 14px;margin:8px 0;font-size:13px;color:#3C3489;line-height:1.7}
+.ok{background:#EAF3DE;border-left:3px solid #3B6D11;padding:10px 14px;margin:8px 0;font-size:13px;color:#27500A;line-height:1.7}
+.warn{background:#FAEEDA;border-left:3px solid #854F0B;padding:10px 14px;margin:8px 0;font-size:13px;color:#633806;line-height:1.7}
+.sbtn-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.sbtn{padding:7px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:12px;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);white-space:nowrap}
+.sbtn.on{background:#534AB7;color:#EEEDFE;border-color:#534AB7}
+.step-desc{font-size:13px;color:var(--color-text-secondary);line-height:1.7;padding:10px 12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin-bottom:10px;min-height:56px}
+canvas{display:block;border-radius:8px;border:0.5px solid var(--color-border-tertiary)}
+.formula-box{background:#EEEDFE;border-radius:var(--border-radius-md);padding:11px 16px;margin:8px 0;font-size:13px;color:#3C3489;font-family:var(--font-mono);text-align:center}
+.codeblock{font-family:var(--font-mono);font-size:12px;background:var(--color-background-secondary);padding:10px 14px;border-radius:var(--border-radius-md);color:var(--color-text-primary);line-height:1.8;white-space:pre;overflow-x:auto;margin:8px 0}
+.flow-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:10px 0}
+.flow-box{border-radius:var(--border-radius-md);padding:8px 12px;font-size:12px;font-weight:500;text-align:center;min-width:80px}
+.flow-arr{font-size:18px;color:var(--color-text-tertiary)}
+.eq-box{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin:10px 0}
+.eq-side{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px;text-align:center}
+.eq-side-title{font-size:11px;color:var(--color-text-secondary);margin-bottom:4px}
+.eq-side-val{font-size:13px;font-weight:500;color:var(--color-text-primary);font-family:var(--font-mono)}
+.eq-op{font-size:22px;color:var(--color-text-tertiary);text-align:center}
+</style>
+
+<div class="wrap">
+
+<div class="card">
+  <div class="card-title">단계별 이해 — 버튼을 순서대로 눌러보세요</div>
+  <div class="sbtn-row">
+    <button class="sbtn on" id="sb0" onclick="setStep(0)">1단계: 문제 상황</button>
+    <button class="sbtn" id="sb1" onclick="setStep(1)">2단계: 이미지 분리</button>
+    <button class="sbtn" id="sb2" onclick="setStep(2)">3단계: log 변환</button>
+    <button class="sbtn" id="sb3" onclick="setStep(3)">4단계: 주파수 필터링</button>
+    <button class="sbtn" id="sb4" onclick="setStep(4)">5단계: 최종 복원</button>
+  </div>
+  <div class="step-desc" id="step-desc">로딩 중...</div>
+  <canvas id="main-canvas" height="240" style="width:100%"></canvas>
+</div>
+
+<div class="card">
+  <div class="card-title">전체 처리 흐름</div>
+  <div class="flow-row">
+    <div class="flow-box" style="background:#EEEDFE;color:#3C3489">원본<br>f(x,y)</div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box" style="background:#FAC775;color:#633806">ln 변환<br>z=ln(f)</div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box" style="background:#9FE1CB;color:#085041">DFT<br>Z(u,v)</div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box" style="background:#9FE1CB;color:#085041">필터링<br>H×Z</div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box" style="background:#FAC775;color:#633806">IDFT<br>s(x,y)</div>
+    <div class="flow-arr">→</div>
+    <div class="flow-box" style="background:#EEEDFE;color:#3C3489">exp 복원<br>g(x,y)</div>
+  </div>
+  <div class="analogy">핵심: 곱셈(×)을 로그(ln)로 덧셈(+)으로 바꿔서 → 조명과 물체를 따로따로 조절할 수 있게 만드는 게 핵심이에요!</div>
+</div>
+
+<div class="card">
+  <div class="card-title">왜 log를 쓰는가? — 수학 핵심</div>
+  <div class="lbl" style="margin-bottom:8px">이미지 = 조명 × 반사율. 곱셈이라서 따로 분리가 불가능해요. 그런데 log를 씌우면?</div>
+  <div class="eq-box">
+    <div class="eq-side">
+      <div class="eq-side-title">log 이전 (곱셈 — 분리 불가)</div>
+      <div class="eq-side-val">f = i × r</div>
+      <div style="font-size:11px;color:var(--color-text-secondary);margin-top:4px">주파수 도메인에서<br>F ≠ I × R (따로 처리 불가)</div>
+    </div>
+    <div class="eq-op">→<br><span style="font-size:11px;color:#534AB7">ln 적용</span></div>
+    <div class="eq-side">
+      <div class="eq-side-title">log 이후 (덧셈 — 분리 가능!)</div>
+      <div class="eq-side-val">ln(f) = ln(i) + ln(r)</div>
+      <div style="font-size:11px;color:var(--color-text-secondary);margin-top:4px">주파수 도메인에서<br>Z = Fᵢ + Fᵣ (따로 처리 가능!)</div>
+    </div>
+  </div>
+  <div class="formula-box">f(x,y) = i(x,y) · r(x,y)
+ln(f) = ln(i) + ln(r)  ← 이제 따로 처리 가능!
+H(u,v) = (γH - γL)(1 - e^(-cD²/D₀²)) + γL
+γL &lt; 1 (조명 약하게), γH &gt; 1 (반사율 강하게)</div>
+</div>
+
+<div class="card">
+  <div class="card-title">필터 파라미터 — γL과 γH의 역할</div>
+  <div class="lbl" style="margin-bottom:8px">슬라이더를 움직여서 조명과 반사율이 어떻게 조절되는지 확인하세요.</div>
+  <div style="display:flex;align-items:center;gap:10px;margin:8px 0">
+    <label style="font-size:13px;color:var(--color-text-secondary);min-width:80px">γL (조명)</label>
+    <input type="range" min="10" max="99" value="50" step="1" id="gl-slider" oninput="updateFilter()" style="flex:1">
+    <span id="gl-out" style="font-size:13px;font-weight:500;color:#534AB7;min-width:36px;text-align:right">0.5</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;margin:8px 0">
+    <label style="font-size:13px;color:var(--color-text-secondary);min-width:80px">γH (반사율)</label>
+    <input type="range" min="101" max="300" value="200" step="1" id="gh-slider" oninput="updateFilter()" style="flex:1">
+    <span id="gh-out" style="font-size:13px;font-weight:500;color:#534AB7;min-width:36px;text-align:right">2.0</span>
+  </div>
+  <canvas id="filter-canvas" height="160" style="width:100%;margin-top:6px"></canvas>
+  <div class="warn" style="margin-top:8px">γL &lt; 1 → 저주파(조명) 약하게 → 전체 밝기 균일화<br>γH &gt; 1 → 고주파(반사율) 강하게 → 세부 디테일 선명하게</div>
+</div>
+
+<div class="card">
+  <div class="card-title">코드 구현</div>
+  <div class="codeblock">img = cv2.imread('sample.jpg', cv2.IMREAD_GRAYSCALE).astype(float)
+
+# Step 1: log 변환 (0 방지 위해 1 더함)
+z = np.log(img + 1)
+
+# Step 2: DFT + centering
+M, N = z.shape
+fp = np.zeros((2*M, 2*N))
+fp[:M, :N] = z * ((-1)**np.indices((M,N)).sum(axis=0))
+Z = np.fft.fft2(fp)
+
+# Step 3: Homomorphic filter (GHPF 기반)
+u = np.arange(2*M) - M
+v = np.arange(2*N) - N
+V, U = np.meshgrid(v, u)
+D2 = U**2 + V**2
+gL, gH, c, D0 = 0.5, 2.0, 1, 30
+H = (gH - gL) * (1 - np.exp(-c * D2 / D0**2)) + gL
+
+# Step 4: 필터 적용 후 IDFT
+S = np.real(np.fft.ifft2(H * Z))[:M, :N]
+S = S * ((-1)**np.indices((M,N)).sum(axis=0))
+
+# Step 5: exp 복원
+result = np.exp(S) - 1
+result = np.clip(result, 0, 255).astype(np.uint8)</div>
+</div>
+
+</div>
+
+<script>
+var STEP = 0;
+var stepDescs = [
+  '사진을 찍을 때 조명이 한쪽만 밝으면, 밝은 쪽은 너무 하얗고 어두운 쪽은 너무 까매서 세부 내용이 안 보여요. 이게 바로 "조명 불균일" 문제예요. Homomorphic Filtering은 이 문제를 해결해줘요!',
+  '이미지는 사실 두 가지가 곱해진 거예요. 조명(i) = 햇빛이나 전등처럼 환경에서 오는 빛, 반사율(r) = 물체 표면이 얼마나 빛을 반사하느냐. f(x,y) = i(x,y) × r(x,y). 조명은 저주파(천천히 변함), 반사율은 고주파(빠르게 변함)이에요!',
+  '곱셈이면 따로 분리가 안 되죠? 그래서 log를 씌워요! ln(f) = ln(i) + ln(r). 곱셈이 덧셈으로 바뀌어서, 주파수 도메인에서 저주파(조명)와 고주파(반사율)를 따로따로 건드릴 수 있게 돼요!',
+  '주파수 도메인에서 특별한 필터 H(u,v)를 적용해요. 저주파(조명)는 γL로 약하게 → 과도한 조명 억제. 고주파(반사율)는 γH로 강하게 → 물체 디테일 선명하게. γL < 1, γH > 1 이어야 해요!',
+  '마지막으로 IDFT로 다시 공간 도메인으로 가져온 뒤, exp()로 log 변환을 되돌려요. ln을 exp로 복원! 결과적으로 조명이 균일해지고 물체 디테일이 선명한 이미지가 완성돼요!'
+];
+
+function setStep(i){
+  STEP = i;
+  for(var k=0;k<5;k++){
+    document.getElementById('sb'+k).className='sbtn'+(k===i?' on':'');
+  }
+  document.getElementById('step-desc').textContent = stepDescs[i];
+  drawMain();
+}
+
+function isDark(){ return window.matchMedia('(prefers-color-scheme: dark)').matches; }
+function tc(){ return isDark()?'#c2c0b6':'#3d3d3a'; }
+function mc(){ return isDark()?'#7a7870':'#9a9890'; }
+function gc(){ return isDark()?'#3a3835':'#dddbd4'; }
+
+function drawMain(){
+  var canvas = document.getElementById('main-canvas');
+  canvas.width = canvas.offsetWidth || 600;
+  var ctx = canvas.getContext('2d');
+  var W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  if(STEP===0) drawProblem(ctx,W,H);
+  else if(STEP===1) drawSeparation(ctx,W,H);
+  else if(STEP===2) drawLog(ctx,W,H);
+  else if(STEP===3) drawFilter(ctx,W,H);
+  else drawResult(ctx,W,H);
+}
+
+function drawProblem(ctx,W,H){
+  var imgW=Math.min(W-20,500), imgH=H-50;
+  var ox=(W-imgW)/2, oy=25;
+  for(var x=0;x<imgW;x++){
+    var t=x/imgW;
+    var illum = 30 + t*200;
+    var objBase = 80 + 40*Math.sin(x/imgW*Math.PI*3);
+    var pix = Math.min(illum*0.6 + objBase*0.4, 255);
+    ctx.fillStyle='rgb('+Math.round(pix)+','+Math.round(pix)+','+Math.round(pix)+')';
+    ctx.fillRect(ox+x, oy, 1, imgH);
+  }
+  ctx.strokeStyle=gc(); ctx.lineWidth=0.5; ctx.strokeRect(ox,oy,imgW,imgH);
+  ctx.fillStyle='#E24B4A'; ctx.font='500 12px sans-serif';
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText('너무 어두움', ox+4, oy+4);
+  ctx.textAlign='right';
+  ctx.fillText('너무 밝음', ox+imgW-4, oy+4);
+  ctx.fillStyle=tc(); ctx.font='11px sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText('조명이 한쪽에서만 비춰서 왼쪽은 어둡고 오른쪽은 너무 밝아요', W/2, H-2);
+}
+
+function drawSeparation(ctx,W,H){
+  var half=Math.floor(W/2)-10;
+  var imgH=H-60;
+  var oy=30;
+
+  ctx.fillStyle=mc(); ctx.font='500 12px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText('조명 i(x,y) — 저주파 (서서히 변함)', half/2+5, oy-4);
+  ctx.fillText('반사율 r(x,y) — 고주파 (빠르게 변함)', half+20+half/2, oy-4);
+
+  for(var x=0;x<half;x++){
+    var t=x/half;
+    var illum=Math.round(30+t*200);
+    ctx.fillStyle='rgb('+illum+','+illum+','+illum+')';
+    ctx.fillRect(5+x, oy, 1, imgH);
+  }
+  ctx.strokeStyle=gc(); ctx.lineWidth=0.5; ctx.strokeRect(5,oy,half,imgH);
+
+  for(var x2=0;x2<half;x2++){
+    var t2=x2/half;
+    var refl=Math.round(100+80*Math.sin(t2*Math.PI*6));
+    ctx.fillStyle='rgb('+refl+','+refl+','+refl+')';
+    ctx.fillRect(half+20+x2, oy, 1, imgH);
+  }
+  ctx.strokeStyle=gc(); ctx.lineWidth=0.5; ctx.strokeRect(half+20,oy,half,imgH);
+
+  ctx.fillStyle='#534AB7'; ctx.font='500 24px sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('×', half+10, oy+imgH/2);
+
+  ctx.fillStyle=tc(); ctx.font='12px sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText('f = i × r  (곱셈이라서 바로 분리 불가)', W/2, H-2);
+}
+
+function drawLog(ctx,W,H){
+  var pad=40, plotW=W-pad*2, plotH=H-70;
+  var oy=30;
+
+  ctx.strokeStyle=gc(); ctx.lineWidth=0.5;
+  ctx.beginPath(); ctx.moveTo(pad,oy); ctx.lineTo(pad,oy+plotH); ctx.lineTo(pad+plotW,oy+plotH); ctx.stroke();
+
+  var colors=['#E24B4A','#185FA5','#534AB7'];
+  var labels=['조명 ln(i) — 저주파','반사율 ln(r) — 고주파','합 ln(f) = ln(i)+ln(r)'];
+  for(var line=0;line<3;line++){
+    ctx.beginPath();
+    ctx.strokeStyle=colors[line]; ctx.lineWidth=line===2?2:1.5;
+    if(line===1) ctx.setLineDash([4,3]); else ctx.setLineDash([]);
+    for(var px=0;px<plotW;px++){
+      var t=px/plotW;
+      var val;
+      if(line===0) val=0.2+t*0.5;
+      else if(line===1) val=0.4+0.2*Math.sin(t*Math.PI*5);
+      else val=0.6+t*0.5+0.2*Math.sin(t*Math.PI*5);
+      var py=oy+plotH-(val*plotH*0.8);
+      if(px===0) ctx.moveTo(pad+px,py); else ctx.lineTo(pad+px,py);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  ctx.font='11px sans-serif'; ctx.textBaseline='middle';
+  colors.forEach(function(c,i){
+    ctx.fillStyle=c; ctx.textAlign='left';
+    ctx.fillText(labels[i], pad+8, oy+20+i*18);
+  });
+
+  ctx.fillStyle='#534AB7'; ctx.font='500 12px sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText('log를 씌우면 곱셈 → 덧셈! 이제 저주파/고주파를 따로 처리할 수 있어요', W/2, H-2);
+  ctx.fillStyle=tc(); ctx.font='11px sans-serif';
+  ctx.fillText('x축: 이미지 위치 →     y축: ln 값 →', pad+plotW/2, oy+plotH+14);
+}
+
+function drawFilter(ctx,W,H){
+  var pad=40, plotW=W-pad*2, plotH=H-70;
+  var oy=25;
+
+  ctx.strokeStyle=gc(); ctx.lineWidth=0.5;
+  ctx.beginPath(); ctx.moveTo(pad,oy); ctx.lineTo(pad,oy+plotH); ctx.lineTo(pad+plotW,oy+plotH); ctx.stroke();
+
+  var gL=0.5, gH=2.0, c=1, D0=0.3;
+  ctx.beginPath(); ctx.strokeStyle='#534AB7'; ctx.lineWidth=2.5;
+  for(var px=0;px<plotW;px++){
+    var d=px/plotW;
+    var h=(gH-gL)*(1-Math.exp(-c*d*d/(D0*D0)))+gL;
+    var py=oy+plotH-(h/2.5)*plotH*0.85;
+    if(px===0) ctx.moveTo(pad+px,py); else ctx.lineTo(pad+px,py);
+  }
+  ctx.stroke();
+
+  var midX=pad+Math.round(plotW*0.15);
+  ctx.setLineDash([3,3]); ctx.strokeStyle='#E24B4A'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pad,oy+plotH*(1-gL/2.5)*0.85); ctx.lineTo(pad+plotW*0.5,oy+plotH*(1-gL/2.5)*0.85); ctx.stroke();
+  ctx.setLineDash([3,3]); ctx.strokeStyle='#1D9E75';
+  ctx.beginPath(); ctx.moveTo(pad,oy+plotH*(1-gH/2.5)*0.85); ctx.lineTo(pad+plotW*0.5,oy+plotH*(1-gH/2.5)*0.85); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.font='500 11px sans-serif'; ctx.textBaseline='middle';
+  ctx.fillStyle='#E24B4A'; ctx.textAlign='left';
+  ctx.fillText('γL=0.5 (저주파 억제 — 조명 균일화)', pad+8, oy+plotH*(1-gL/2.5)*0.85+1);
+  ctx.fillStyle='#1D9E75';
+  ctx.fillText('γH=2.0 (고주파 강조 — 디테일 선명)', pad+8, oy+plotH*(1-gH/2.5)*0.85-10);
+
+  ctx.fillStyle=tc(); ctx.font='11px sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText('← 저주파 (조명)          고주파 (반사율, 디테일) →', W/2, H-20);
+  ctx.fillText('H(u,v) = (γH - γL)(1 - e^(-cD²/D₀²)) + γL', W/2, H-4);
+}
+
+function drawResult(ctx,W,H){
+  var third=Math.floor((W-20)/3);
+  var imgH=H-55, oy=35;
+  var titles=['원본 (조명 불균일)','처리 중 (log+필터)','결과 (균일+선명)'];
+  var bdrCol=['#E24B4A','#EF9F27','#1D9E75'];
+
+  for(var img=0;img<3;img++){
+    var ox=10+img*(third+5);
+    for(var x=0;x<third;x++){
+      var t=x/third;
+      var pix;
+      if(img===0){
+        var illum=30+t*200, refl=80+40*Math.sin(t*Math.PI*4);
+        pix=Math.min(illum*0.6+refl*0.4,255);
+      } else if(img===1){
+        var lv=Math.log(Math.max(30+t*200,1))*0.6;
+        var lr=Math.log(Math.max(80+40*Math.sin(t*Math.PI*4),1))*0.4;
+        pix=Math.min((lv+lr)*30,255);
+      } else {
+        var base=120, detail=50*Math.sin(t*Math.PI*4);
+        pix=Math.min(Math.max(base+detail,0),255);
+      }
+      ctx.fillStyle='rgb('+Math.round(pix)+','+Math.round(pix)+','+Math.round(pix)+')';
+      ctx.fillRect(ox+x, oy, 1, imgH);
+    }
+    ctx.strokeStyle=bdrCol[img]; ctx.lineWidth=1.5;
+    ctx.strokeRect(ox,oy,third,imgH);
+    ctx.fillStyle=bdrCol[img]; ctx.font='500 11px sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillText(titles[img], ox+third/2, oy-4);
+  }
+
+  ctx.fillStyle='#534AB7'; ctx.font='24px sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('→', 10+third+2, oy+imgH/2);
+  ctx.fillText('→', 10+third*2+7, oy+imgH/2);
+
+  ctx.fillStyle=tc(); ctx.font='12px sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText('조명이 균일해지고 물체 디테일이 선명해졌어요!', W/2, H-2);
+}
+
+function updateFilter(){
+  var gL=parseInt(document.getElementById('gl-slider').value)/100;
+  var gH=parseInt(document.getElementById('gh-slider').value)/100;
+  document.getElementById('gl-out').textContent=gL.toFixed(1);
+  document.getElementById('gh-out').textContent=gH.toFixed(1);
+  drawFilterGraph(gL,gH);
+}
+
+function drawFilterGraph(gL,gH){
+  var canvas=document.getElementById('filter-canvas');
+  canvas.width=canvas.offsetWidth||600;
+  var ctx=canvas.getContext('2d');
+  var W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  var pad=40, plotW=W-pad*2, plotH=H-30;
+  var oy=10, c=1, D0=0.3;
+
+  ctx.strokeStyle=gc(); ctx.lineWidth=0.5;
+  ctx.beginPath(); ctx.moveTo(pad,oy); ctx.lineTo(pad,oy+plotH); ctx.lineTo(pad+plotW,oy+plotH); ctx.stroke();
+
+  var maxH=Math.max(gH,2.5);
+  ctx.beginPath(); ctx.strokeStyle='#534AB7'; ctx.lineWidth=2;
+  for(var px=0;px<plotW;px++){
+    var d=px/plotW;
+    var h=(gH-gL)*(1-Math.exp(-c*d*d/(D0*D0)))+gL;
+    var py=oy+plotH-(h/maxH)*plotH*0.9;
+    if(px===0) ctx.moveTo(pad+px,py); else ctx.lineTo(pad+px,py);
+  }
+  ctx.stroke();
+
+  ctx.font='11px sans-serif'; ctx.textBaseline='middle';
+  ctx.fillStyle='#E24B4A'; ctx.textAlign='left';
+  ctx.fillText('γL='+gL.toFixed(1)+' (저주파)', pad+6, oy+plotH*(1-gL/maxH)*0.9+1);
+  ctx.fillStyle='#1D9E75';
+  var ghY=oy+plotH*(1-gH/maxH)*0.9;
+  if(ghY < oy+14) ghY=oy+14;
+  ctx.fillText('γH='+gH.toFixed(1)+' (고주파)', pad+6, ghY);
+
+  ctx.fillStyle=mc(); ctx.font='10px sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText('← 저주파                         고주파 →', W/2, H-1);
+}
+
+function init(){
+  setStep(0);
+  updateFilter();
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',init);
+} else {
+  setTimeout(init,80);
+}
+window.addEventListener('resize',function(){ drawMain(); drawFilterGraph(
+  parseInt(document.getElementById('gl-slider').value)/100,
+  parseInt(document.getElementById('gh-slider').value)/100
+); });
+</script>
