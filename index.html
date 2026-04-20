@@ -539,16 +539,22 @@ cv2.destroyAllWindows()</pre>
           <pre class="cp-code">import numpy as np
 import cv2
 
-# Zone Plate 생성
-size = 512
-x = np.arange(size) - size // 2
-y = np.arange(size) - size // 2
-X, Y = np.meshgrid(x, y)
-r2   = X**2 + Y**2
-zone = ((np.cos(r2 / 500.0) + 1) / 2 * 255).astype(np.uint8)
+# Zone Plate 생성 (PDF 원본: np.linspace + np.sin 방식)
+def generate_zone_plate(size=512):
+    x = np.linspace(-1, 1, size)
+    y = np.linspace(-1, 1, size)
+    X, Y = np.meshgrid(x, y)
+    R = np.sqrt(X**2 + Y**2)
+    # 중심에서 멀수록 주파수가 증가
+    zone_plate = np.sin(100 * np.pi * R**2)
+    # -1~1 → 0~255 uint8 변환
+    zone_plate = ((zone_plate + 1) / 2 * 255).astype(np.uint8)
+    return zone_plate
+
+zone = generate_zone_plate(512)
 P, Q = zone.shape
 
-# stride 2, 4, 8로 각각 서브샘플링 → 복원
+# stride 2, 4, 8로 각각 서브샘플링 → 원본 크기로 복원
 for stride in [2, 4, 8]:
     sampled  = zone[::stride, ::stride]
     restored = cv2.resize(sampled, (Q, P),
@@ -562,12 +568,17 @@ for stride in [2, 4, 8]:
           <pre class="cp-code">import numpy as np
 import cv2
 
-size = 512
-x = np.arange(size) - size // 2
-y = np.arange(size) - size // 2
-X, Y = np.meshgrid(x, y)
-r2   = X**2 + Y**2
-zone = ((np.cos(r2 / 500.0) + 1) / 2 * 255).astype(np.uint8)
+# Zone Plate 생성 (PDF 원본: np.linspace + np.sin 방식)
+def generate_zone_plate(size=512):
+    x = np.linspace(-1, 1, size)
+    y = np.linspace(-1, 1, size)
+    X, Y = np.meshgrid(x, y)
+    R = np.sqrt(X**2 + Y**2)
+    zone_plate = np.sin(100 * np.pi * R**2)
+    zone_plate = ((zone_plate + 1) / 2 * 255).astype(np.uint8)
+    return zone_plate
+
+zone = generate_zone_plate(512)
 P, Q = zone.shape
 
 stride = 4
@@ -689,7 +700,41 @@ cv2.destroyAllWindows()</pre>
         </div>
 
         <div class="cp-card">
-          <div class="cp-card-title">실습 2 · 히스토그램 평활화 내장 함수 (참고용)</div>
+          <div class="cp-card-title">실습 2 · Manual Contrast Enhancement — PDF 코드</div>
+          <div class="cp-desc">픽셀 값 범위별로 서로 다른 선형 변환을 적용해 대비를 향상시킨다.</div>
+          <pre class="cp-code">import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+image = cv2.imread('bean.tif', 0)
+H, W  = image.shape
+
+corrected_img = np.zeros((H, W))
+
+for i in range(H):
+    for j in range(W):
+        if image[i, j] &lt; 80:
+            corrected_img[i, j] = image[i, j] * 0.25
+        elif image[i, j] &lt; 140:
+            corrected_img[i, j] = image[i, j] * 3.0 - 220
+        else:
+            corrected_img[i, j] = max(image[i, j] * 0.5 + 130, 255)
+
+fig = plt.figure()
+ax0 = fig.add_subplot(211)
+ax0.hist(image.ravel(), 256, [0, 256])
+ax1 = fig.add_subplot(212)
+ax1.hist(corrected_img.ravel(), 256, [0, 256])
+plt.show()
+
+cv2.imshow('original', image)
+cv2.imshow('contrast_enhancement', corrected_img.astype(np.uint8))
+cv2.waitKey(0)
+cv2.destroyAllWindows()</pre>
+        </div>
+
+        <div class="cp-card">
+          <div class="cp-card-title">실습 3 · 히스토그램 평활화 내장 함수 (참고용)</div>
           <div class="cp-warn">⚠️ 과제에서 이 코드를 사용하면 미제출 처리! 참고만 하세요.</div>
           <pre class="cp-code">import cv2
 import numpy as np
@@ -847,7 +892,8 @@ dft2d = np.fft.fft2(padded_image_new)
 dft2d_ = np.log(np.abs(dft2d))    # 로그 스케일 시각화
 
 plt.imshow(dft2d_.real, cmap='gray'), plt.axis('off')
-plt.show()</pre>
+plt.show()
+print('Complete the DFT with centering')</pre>
         </div>
 
         <div class="cp-card">
@@ -877,7 +923,7 @@ def BLPF(image, order, cutoff):
         for v in range(N):
             u_ = np.abs(u - U0)
             v_ = np.abs(v - V0)
-            H[u, v] = 1 / (1 + (D[np.abs(u_), np.abs(v_)] / D0) ** (2 * n))
+            H[u, v] = 1 / (1 + (D[u_, v_] / D0) ** (2 * n))
 
     return H
 
